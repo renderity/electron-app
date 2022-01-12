@@ -9,7 +9,7 @@ max-statements,
 import './index.scss';
 import '@babel/polyfill';
 
-
+import * as dat from 'dat.gui';
 
 import TestWorker from 'worker-loader!./test.worker.js';
 
@@ -18,6 +18,17 @@ import WebGL from '../../../../renderers-web/src/webgl-renderer.js';
 import WebGPU from '../../../../renderers-web/src/webgpu-renderer.js';
 
 import wasm_code from './cpp/src/entry-wasm32.cpp';
+
+
+
+const dat_gui = new dat.GUI();
+
+const gui_options =
+{
+	API: 'webgl',
+};
+
+const gui_options_API = {};
 
 
 
@@ -69,6 +80,380 @@ window.addEventListener
 
 
 
+		// window.addEventListener
+		// (
+		// 	'mousemove',
+
+		// 	(evt) =>
+		// 	{
+		// 		wasm.exports._ZN3RS4MATH5Orbit7rotate2Eff(orbit, evt.movementX * 0.01, evt.movementY * 0.01);
+		// 		wasm.exports._ZN3RS4MATH5Orbit6updateEv(orbit);
+
+		// 		wasm.exports.startTransition();
+		// 	},
+		// );
+
+
+
+		let renderer_native = null;
+		let renderer_webgl = null;
+		let renderer_webgl2 = null;
+		let renderer_webgpu = null;
+
+
+
+		{
+			const webgl = new WebGL(wasm);
+
+			const renderer =
+				new webgl.Renderer(renderer_addr, document.querySelectorAll('canvas')[0], 'webgl');
+
+			if (renderer.exists)
+			{
+				gui_options_API.WebGL = 'webgl';
+
+				renderer_webgl = renderer;
+				renderer_native = renderer_webgl;
+
+				gui_options.API = 'webgl';
+
+
+
+				const gl = renderer._context;
+
+
+
+				const
+					{
+						Scene,
+						Material,
+						Object,
+					} = renderer;
+
+				const scene = Scene.getInstance(scene_addr);
+				const material = Material.getInstance(material_addr);
+				const material2 = Material.getInstance(material2_addr);
+				const _object = Object.getInstance(object_addr);
+				const object2 = Object.getInstance(object2_addr);
+
+
+
+				const b = gl.createBuffer();
+
+				gl.bindBuffer(gl.ARRAY_BUFFER, b);
+				gl.bufferData(gl.ARRAY_BUFFER, scene.vertex_data, gl.STATIC_DRAW);
+				gl.vertexAttribPointer(0, 3, gl.FLOAT, 0, 0, 0);
+
+				gl.enableVertexAttribArray(0);
+
+
+
+				let time = Date.now();
+
+				const [ fps ] = document.querySelectorAll('.fps');
+
+				let fps_counter = 0;
+
+				renderer.loop_function = () =>
+				{
+					gl.clear(gl.COLOR_BUFFER_BIT);
+
+					material.use();
+
+					_object.draw();
+
+					material2.use();
+
+					object2.draw();
+
+
+
+					if (Math.floor((Date.now() - time) * 0.001))
+					{
+						fps.innerHTML = fps_counter;
+
+						fps_counter = 0;
+
+						time = Date.now();
+					}
+
+					++fps_counter;
+				};
+			}
+		}
+
+
+
+		{
+			const webgl = new WebGL(wasm);
+
+			const renderer =
+				new webgl.Renderer(renderer_addr, document.querySelectorAll('canvas')[1], 'webgl2');
+
+			if (renderer.exists)
+			{
+				gui_options_API.WebGL2 = 'webgl2';
+
+				renderer_webgl2 = renderer;
+				renderer_native = renderer_webgl2;
+
+				gui_options.API = 'webgl2';
+
+
+
+				const gl = renderer._context;
+
+
+
+				const
+					{
+						Scene,
+						Material,
+						UniformBlock,
+						Object,
+					} = renderer;
+
+
+
+				const scene = Scene.getInstance(scene_addr);
+				const material = Material.getInstance(material_addr);
+				const material2 = Material.getInstance(material2_addr);
+				const uniform_block0 = UniformBlock.getInstance(uniform_block0_addr);
+				const _object = Object.getInstance(object_addr);
+				const object2 = Object.getInstance(object2_addr);
+
+
+
+				const b = gl.createBuffer();
+
+				gl.bindBuffer(gl.ARRAY_BUFFER, b);
+				gl.bufferData(gl.ARRAY_BUFFER, scene.vertex_data, gl.STATIC_DRAW);
+				gl.vertexAttribPointer(0, 3, gl.FLOAT, 0, 0, 0);
+
+				gl.enableVertexAttribArray(0);
+
+
+
+				let time = Date.now();
+
+				const [ , fps ] = document.querySelectorAll('.fps');
+
+				let fps_counter = 0;
+
+				renderer.loop_function = () =>
+				{
+					gl.clear(gl.COLOR_BUFFER_BIT);
+
+					uniform_block0.use();
+
+					material.use();
+
+					_object.draw();
+
+					material2.use();
+
+					object2.draw();
+
+
+
+
+					if (Math.floor((Date.now() - time) * 0.001))
+					{
+						fps.innerHTML = fps_counter;
+
+						fps_counter = 0;
+
+						time = Date.now();
+					}
+
+					++fps_counter;
+				};
+			}
+		}
+
+
+
+		{
+			const webgpu = new WebGPU(wasm);
+
+			const renderer =
+				new webgpu.Renderer
+				(
+					renderer_addr,
+
+					{
+						canvas: document.querySelectorAll('canvas')[2],
+					},
+				);
+
+			if (renderer.exists)
+			{
+				gui_options_API.WebGPU = 'webgpu';
+
+				renderer_webgpu = renderer;
+				renderer_native = renderer_webgpu;
+
+				gui_options.API = 'webgpu';
+
+				await renderer.init();
+
+
+
+				const
+					{
+						Scene,
+						Material,
+						// UniformBlock,
+						DescriptorSet,
+						Object,
+					} = renderer;
+
+
+
+				const scene = Scene.getInstance(scene_addr);
+				const material = Material.getInstance(material_addr, Material.ShaderUsage.GLSL_VULKAN);
+				const material2 = Material.getInstance(material2_addr, Material.ShaderUsage.GLSL_VULKAN);
+				// const uniform_block0 = UniformBlock.getInstance(uniform_block0_addr);
+				const desc_set1 = DescriptorSet.getInstance(desc_set1_addr);
+				const desc_set2 = DescriptorSet.getInstance(desc_set2_addr);
+				const _object = Object.getInstance(object_addr);
+				const object2 = Object.getInstance(object2_addr);
+
+
+
+				const c =
+					renderer.device.createBuffer
+					({
+						size: scene.vertex_data.byteLength,
+
+						usage:
+						(
+							window.GPUBufferUsage.COPY_DST |
+							window.GPUBufferUsage.VERTEX
+						),
+					});
+
+				renderer.device.queue.writeBuffer(c, 0, scene.vertex_data, 0, scene.vertex_data.length);
+
+
+
+				let time = Date.now();
+
+				const [ ,, fps ] = document.querySelectorAll('.fps');
+
+				let fps_counter = 0;
+
+				renderer.loop_function = () =>
+				{
+					const command_encoder = renderer.device.createCommandEncoder();
+
+					const context_texture = renderer._context.getCurrentTexture();
+
+					renderer.render_pass_encoder =
+						command_encoder.beginRenderPass
+						({
+							colorAttachments:
+							[
+								{
+									view: context_texture.createView(),
+									// GPUTextureView resolveTarget;
+
+									loadValue: [ 1, 1, 1, 1 ],
+									storeOp: 'store',
+								},
+							],
+						});
+
+					renderer.render_pass_encoder.setVertexBuffer(0, c, 0, scene.vertex_data.byteLength);
+
+					desc_set1.use(0);
+
+					material.use();
+
+					_object.draw();
+
+					desc_set2.use(0);
+
+					material2.use();
+
+					object2.draw();
+
+					renderer.render_pass_encoder.endPass();
+
+					const command_buffer = command_encoder.finish();
+
+					renderer.device.queue.submit([ command_buffer ]);
+
+
+
+					if (Math.floor((Date.now() - time) * 0.001))
+					{
+						fps.innerHTML = fps_counter;
+
+						fps_counter = 0;
+
+						time = Date.now();
+					}
+
+					++fps_counter;
+				};
+			}
+		}
+
+
+
+		{
+
+		}
+
+
+
+		dat_gui
+			.add(gui_options, 'API', gui_options_API)
+			.onChange
+			(
+				(value) =>
+				{
+					renderer_native.endLoop();
+
+					renderer_native.canvas.parentNode.style.display = 'none';
+
+					switch (value)
+					{
+					case 'webgl':
+					{
+						renderer_native = renderer_webgl;
+
+						break;
+					}
+
+					case 'webgl2':
+					{
+						renderer_native = renderer_webgl2;
+
+						break;
+					}
+
+					case 'webgpu':
+					{
+						renderer_native = renderer_webgpu;
+
+						break;
+					}
+
+					default:
+					}
+
+					renderer_native.canvas.parentNode.style.display = 'block';
+
+					renderer_native.startLoop();
+				},
+			);
+
+		renderer_native.canvas.parentNode.style.display = 'block';
+
+
+
 		// wasm.exports.initTransitionStack();
 
 		const updateOrbit = () =>
@@ -93,303 +478,7 @@ window.addEventListener
 
 
 
-		window.addEventListener
-		(
-			'mousemove',
-
-			(evt) =>
-			{
-			// 	wasm.exports._ZN3RS4MATH5Orbit7rotate2Eff(orbit, evt.movementX * 0.01, evt.movementY * 0.01);
-			// 	wasm.exports._ZN3RS4MATH5Orbit6updateEv(orbit);
-
-				// wasm.exports.startTransition();
-			},
-		);
-
-
-
-		{
-			// const renderer =
-			// 	new WebGLRenderer(wasm, document.querySelectorAll('canvas')[0], 'webgl', window.innerWidth / 3, window.innerHeight);
-
-
-
-			// const
-			// 	{
-			// 		Scene,
-			// 		Material,
-			// 		Object,
-			// 	} = renderer;
-
-
-
-			// const scene = Scene.getInstance(scene_addr);
-			// const material = Material.getInstance(material_addr);
-			// const material2 = Material.getInstance(material2_addr);
-			// const _object = Object.getInstance(object_addr);
-			// const object2 = Object.getInstance(object2_addr);
-
-
-
-			// const gl = renderer._context;
-
-
-
-			// const b = gl.createBuffer();
-
-			// gl.bindBuffer(gl.ARRAY_BUFFER, b);
-			// gl.bufferData(gl.ARRAY_BUFFER, scene.vertex_data, gl.STATIC_DRAW);
-			// gl.vertexAttribPointer(0, 3, gl.FLOAT, 0, 0, 0);
-
-			// gl.enableVertexAttribArray(0);
-
-
-
-			// let time = Date.now();
-
-			// const [ fps ] = document.querySelectorAll('.fps');
-
-			// let fps_counter = 0;
-
-			// const render = () =>
-			// {
-			// 	gl.clear(gl.COLOR_BUFFER_BIT);
-
-			// 	material.use();
-
-			// 	_object.draw();
-
-			// 	material2.use();
-
-			// 	object2.draw();
-
-
-
-			// 	if (Math.floor((Date.now() - time) * 0.001))
-			// 	{
-			// 		fps.innerHTML = fps_counter;
-
-			// 		fps_counter = 0;
-
-			// 		time = Date.now();
-			// 	}
-
-			// 	++fps_counter;
-
-
-
-			// 	requestAnimationFrame(render);
-			// };
-
-			// render();
-		}
-
-
-
-		{
-			// const _WebGL = new WebGL(wasm);
-
-			// const renderer = new _WebGL.Renderer(renderer_addr, document.querySelectorAll('canvas')[1], 'webgl2');
-
-			// const gl = renderer._context;
-
-
-
-			// const
-			// 	{
-			// 		Scene,
-			// 		Material,
-			// 		UniformBlock,
-			// 		Object,
-			// 	} = renderer;
-
-
-
-			// const scene = Scene.getInstance(scene_addr);
-			// const material = Material.getInstance(material_addr);
-			// const material2 = Material.getInstance(material2_addr);
-			// const uniform_block0 = UniformBlock.getInstance(uniform_block0_addr);
-			// const _object = Object.getInstance(object_addr);
-			// const object2 = Object.getInstance(object2_addr);
-
-
-
-			// const b = gl.createBuffer();
-
-			// gl.bindBuffer(gl.ARRAY_BUFFER, b);
-			// gl.bufferData(gl.ARRAY_BUFFER, scene.vertex_data, gl.STATIC_DRAW);
-			// gl.vertexAttribPointer(0, 3, gl.FLOAT, 0, 0, 0);
-
-			// gl.enableVertexAttribArray(0);
-
-
-
-			// let time = Date.now();
-
-			// const [ , fps ] = document.querySelectorAll('.fps');
-
-			// let fps_counter = 0;
-
-			// const render = () =>
-			// {
-			// 	gl.clear(gl.COLOR_BUFFER_BIT);
-
-			// 	uniform_block0.use();
-
-			// 	material.use();
-
-			// 	_object.draw();
-
-			// 	material2.use();
-
-			// 	object2.draw();
-
-
-
-
-			// 	if (Math.floor((Date.now() - time) * 0.001))
-			// 	{
-			// 		fps.innerHTML = fps_counter;
-
-			// 		fps_counter = 0;
-
-			// 		time = Date.now();
-			// 	}
-
-			// 	++fps_counter;
-
-
-
-			// 	requestAnimationFrame(render);
-			// };
-
-			// render();
-		}
-
-
-
-		{
-			const _WebGPU = new WebGPU(wasm);
-
-			const renderer =
-				new _WebGPU.Renderer
-				(
-					renderer_addr,
-
-					{
-						canvas: document.querySelectorAll('canvas')[2],
-					},
-				);
-
-			await renderer.init();
-
-
-
-			const
-				{
-					Scene,
-					Material,
-					// UniformBlock,
-					DescriptorSet,
-					Object,
-				} = renderer;
-
-
-
-			const scene = Scene.getInstance(scene_addr);
-			const material = Material.getInstance(material_addr, Material.ShaderUsage.GLSL_VULKAN);
-			const material2 = Material.getInstance(material2_addr, Material.ShaderUsage.GLSL_VULKAN);
-			// const uniform_block0 = UniformBlock.getInstance(uniform_block0_addr);
-			const desc_set1 = DescriptorSet.getInstance(desc_set1_addr);
-			const desc_set2 = DescriptorSet.getInstance(desc_set2_addr);
-			const _object = Object.getInstance(object_addr);
-			const object2 = Object.getInstance(object2_addr);
-
-
-
-			const c =
-				renderer.device.createBuffer
-				({
-					size: scene.vertex_data.byteLength,
-
-					usage:
-					(
-						window.GPUBufferUsage.COPY_DST |
-						window.GPUBufferUsage.VERTEX
-					),
-				});
-
-			renderer.device.queue.writeBuffer(c, 0, scene.vertex_data, 0, scene.vertex_data.length);
-
-
-
-			let time = Date.now();
-
-			const [ ,, fps ] = document.querySelectorAll('.fps');
-
-			let fps_counter = 0;
-
-			const render = () =>
-			{
-				const command_encoder = renderer.device.createCommandEncoder();
-
-				const context_texture = renderer._context.getCurrentTexture();
-
-				renderer.render_pass_encoder =
-					command_encoder.beginRenderPass
-					({
-						colorAttachments:
-						[
-							{
-								view: context_texture.createView(),
-								// GPUTextureView resolveTarget;
-
-								loadValue: [ 1, 1, 1, 1 ],
-								storeOp: 'store',
-							},
-						],
-					});
-
-				renderer.render_pass_encoder.setVertexBuffer(0, c, 0, scene.vertex_data.byteLength);
-
-				desc_set1.use(0);
-
-				material.use();
-
-				_object.draw();
-
-				desc_set2.use(0);
-
-				material2.use();
-
-				object2.draw();
-
-				renderer.render_pass_encoder.endPass();
-
-				const command_buffer = command_encoder.finish();
-
-				renderer.device.queue.submit([ command_buffer ]);
-
-
-
-				if (Math.floor((Date.now() - time) * 0.001))
-				{
-					fps.innerHTML = fps_counter;
-
-					fps_counter = 0;
-
-					time = Date.now();
-				}
-
-				++fps_counter;
-
-
-
-				requestAnimationFrame(render);
-			};
-
-			render();
-		}
+		renderer_native.startLoop();
 	},
 );
 
