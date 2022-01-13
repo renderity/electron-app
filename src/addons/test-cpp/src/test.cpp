@@ -10,7 +10,7 @@
 
 #include "napi.h"
 
-#include "renderers/src/base/renderer.h"
+#include "renderity/renderers/src/base/renderer.h"
 
 
 
@@ -25,8 +25,8 @@ extern RDTY::RENDERERS::Renderer* renderer_native;
 
 void rendernig_thread (void)
 {
-	// initOpengl();
-	initVulkan();
+	initOpengl();
+	// initVulkan();
 }
 
 std::thread* rendernig_thread_handle {};
