@@ -7,11 +7,13 @@ html
 
 	body
 		.canvas-wrapper(style="display: none;")
-			canvas
+			canvas#webgl-canvas
 			.fps
 		.canvas-wrapper(style="display: none;")
-			canvas
+			canvas#webgl2-canvas
 			.fps
 		.canvas-wrapper(style="display: none;")
-			canvas
+			canvas#webgpu-canvas
 			.fps
+		.canvas-wrapper(style="display: none;")
+			canvas#offscreen-canvas
