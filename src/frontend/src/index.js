@@ -54,7 +54,7 @@ window.addEventListener
 
 		wasm.exports.initTransitionStack();
 
-		wasm.exports._Z19constructRsWrappersv();
+		wasm.exports._Z19constructRenderityWrappersv();
 
 
 
