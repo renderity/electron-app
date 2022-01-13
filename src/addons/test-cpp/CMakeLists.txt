@@ -9,7 +9,10 @@ add_library(${PROJECT_NAME} SHARED ${SOURCE_FILES} ${CMAKE_JS_SRC})
 
 set_target_properties(${PROJECT_NAME} PROPERTIES PREFIX "" SUFFIX ".node")
 
-target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_JS_INC} "${CMAKE_SOURCE_DIR}/node_modules/node-addon-api" "/home/denis/reps/renderity", "/home/denis/reps/renderity/renderers/src/glad/include", "/home/denis/reps/KhronosGroup/glslang")
+target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_JS_INC} "${CMAKE_SOURCE_DIR}/node_modules/node-addon-api")
+
+# For renderity includes and renderity internal includes
+target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_JS_INC} "/home/denis/reps" "/home/denis/reps/renderity")
 
 target_link_libraries(${PROJECT_NAME} ${CMAKE_JS_LIB} /home/denis/reps/renderity/test/build/gcc-x64/output/a/test.a)
 
