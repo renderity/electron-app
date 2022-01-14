@@ -6,15 +6,15 @@ import WasmWrapper from '../../../../renderers-web/src/wasm-wrapper.js';
 
 onmessage = async (message) =>
 {
-	const { id, code, memory } = message.data;
-
 	const wasm = new WasmWrapper();
 
-	await wasm.init(code, memory, false);
+	const { thread_index, wasm_code, wasm_memory } = message.data;
+
+	await wasm.init(wasm_code, wasm_memory, false);
 
 
 
-	switch (id)
+	switch (thread_index)
 	{
 	case 0:
 
