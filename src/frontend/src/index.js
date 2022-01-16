@@ -517,107 +517,112 @@ window.addEventListener
 
 
 
-// const
-// 	{
-// 		testRenderingThread,
-// 		runRenderingThread,
-// 		getPixelDataStorageIsAllocated,
-// 		getRendererSize,
-// 		getPixelDataStorage,
-// 		// rotateOrbitJs,
-// 	}	= window.__CPP_MODULE__;
+const
+	{
+		testRenderingThread,
+		runRenderingThread,
+		getPixelDataStorageIsAllocated,
+		getRendererSize,
+		getPixelDataStorage,
+		// rotateOrbitJs,
+		getOpenglVersionString,
+		getVulkanVersionString,
+	}	= window.__CPP_MODULE__;
 
 
 
-// // const rotateOrbit = (evt) =>
-// // {
-// // 	rotateOrbitJs(-evt.movementX * 0.01, -evt.movementY * 0.01);
-// // };
+// const rotateOrbit = (evt) =>
+// {
+// 	rotateOrbitJs(-evt.movementX * 0.01, -evt.movementY * 0.01);
+// };
 
-// // const stopOrbitRotation = () =>
-// // {
-// // 	window.removeEventListener('mousemove', rotateOrbit);
-// // 	window.removeEventListener('mouseup', stopOrbitRotation);
-// // };
+// const stopOrbitRotation = () =>
+// {
+// 	window.removeEventListener('mousemove', rotateOrbit);
+// 	window.removeEventListener('mouseup', stopOrbitRotation);
+// };
 
-// // canvas.addEventListener
-// // (
-// // 	'mousedown',
-
-// // 	() =>
-// // 	{
-// // 		window.addEventListener('mousemove', rotateOrbit);
-// // 		window.addEventListener('mouseup', stopOrbitRotation);
-// // 	},
-// // );
-
-// // window.addEventListener('mouseup', stopOrbitRotation);
-
-
-
-// window.addEventListener
+// canvas.addEventListener
 // (
-// 	'load',
+// 	'mousedown',
 
-// 	async () =>
+// 	() =>
 // 	{
-// 		// Redundant? Does reloading of window cause killing of all processes and
-// 		// threads spawned from them, so rendering thread does never exist
-// 		// after reloading?
-// 		if (!testRenderingThread())
-// 		{
-// 			runRenderingThread();
-// 		}
-
-// 		let interval = null;
-
-// 		await new Promise
-// 		(
-// 			(resolve) =>
-// 			{
-// 				interval =
-// 					setInterval
-// 					(
-// 						() =>
-// 						{
-// 							if (getPixelDataStorageIsAllocated())
-// 							{
-// 								clearInterval(interval);
-
-// 								resolve();
-// 							}
-// 						},
-
-// 						1000,
-// 					);
-// 			},
-// 		);
-
-// 		const { renderer_width, renderer_height } = getRendererSize();
-
-// 		const canvas = document.querySelector('#offscreen');
-// 		canvas.width = renderer_width;
-// 		canvas.height = renderer_height;
-// 		canvas.style.width = `${ renderer_width }px`;
-// 		canvas.style.height = `${ renderer_height }px`;
-
-// 		const canvas_context = canvas.getContext('2d');
-
-// 		const image_data = canvas_context.createImageData(renderer_width, renderer_height);
-
-// 		const pixel_data_storage = getPixelDataStorage();
-
-// 		const render = () =>
-// 		{
-// 			image_data.data.set(pixel_data_storage);
-
-// 			canvas_context.putImageData(image_data, 0, 0);
-
-// 			requestAnimationFrame(render);
-// 		};
-
-// 		canvas.parentNode.style.display = 'block';
-
-// 		render();
+// 		window.addEventListener('mousemove', rotateOrbit);
+// 		window.addEventListener('mouseup', stopOrbitRotation);
 // 	},
 // );
+
+// window.addEventListener('mouseup', stopOrbitRotation);
+
+
+
+window.addEventListener
+(
+	'load',
+
+	async () =>
+	{
+		// Redundant? Does reloading of window cause killing of all processes and
+		// threads spawned from them, so rendering thread does never exist
+		// after reloading?
+		await LOG(getOpenglVersionString());
+		await LOG(getVulkanVersionString());
+
+		if (!testRenderingThread())
+		{
+			runRenderingThread('vulkan');
+		}
+
+		let interval = null;
+
+		await new Promise
+		(
+			(resolve) =>
+			{
+				interval =
+					setInterval
+					(
+						() =>
+						{
+							if (getPixelDataStorageIsAllocated())
+							{
+								clearInterval(interval);
+
+								resolve();
+							}
+						},
+
+						1000,
+					);
+			},
+		);
+
+		const { renderer_width, renderer_height } = getRendererSize();
+
+		const canvas = document.querySelector('#offscreen');
+		canvas.width = renderer_width;
+		canvas.height = renderer_height;
+		canvas.style.width = `${ renderer_width }px`;
+		canvas.style.height = `${ renderer_height }px`;
+
+		const canvas_context = canvas.getContext('2d');
+
+		const image_data = canvas_context.createImageData(renderer_width, renderer_height);
+
+		const pixel_data_storage = getPixelDataStorage();
+
+		const render = () =>
+		{
+			image_data.data.set(pixel_data_storage);
+
+			canvas_context.putImageData(image_data, 0, 0);
+
+			requestAnimationFrame(render);
+		};
+
+		canvas.parentNode.style.display = 'block';
+
+		render();
+	},
+);

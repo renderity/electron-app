@@ -4,13 +4,18 @@
 
 
 
+#include <cstddef>
 #include <cstdint>
 #include <cstring>
+#include <string>
+#include <vector>
 #include <thread>
 
 #include "napi.h"
 
 #include "renderity/renderers/src/base/renderer.h"
+#include "renderity/renderers/src/opengl/opengl.h"
+#include "renderity/renderers/src/vulkan/vulkan.h"
 
 
 
@@ -21,34 +26,86 @@ extern void initVulkan (void);
 
 extern RDTY::RENDERERS::Renderer* renderer_native;
 
+extern size_t render_flag;
 
 
-void rendernig_thread (void)
+
+std::thread* rendering_thread_handle {};
+
+Napi::Value getOpenglVersionString (const Napi::CallbackInfo& info)
 {
-	initOpengl();
-	// initVulkan();
+	return Napi::String::New(info.Env(), RDTY::OPENGL::RendererBase::test());
 }
 
-std::thread* rendernig_thread_handle {};
+Napi::Value getVulkanVersionString (const Napi::CallbackInfo& info)
+{
+	std::vector<VkPhysicalDevice> physical_devices = RDTY::VULKAN::RendererBase::test();
+
+	Napi::Object result = Napi::Object::New(info.Env());
+
+	for (VkPhysicalDevice physical_device : physical_devices)
+	{
+		VkPhysicalDeviceProperties physical_device_properties {};
+
+		vkGetPhysicalDeviceProperties(physical_device, &physical_device_properties);
+		// cout << inst.physical_device_count << endl;
+		// cout << pProperties.apiVersion << endl;
+		// cout << pProperties.driverVersion << endl;
+		// cout << pProperties.vendorID << endl;
+		// cout << pProperties.deviceID << endl;
+		// cout << pProperties.deviceType << endl;
+
+		result.Set(std::string(physical_device_properties.deviceName), (size_t) physical_device);
+	}
+
+	return result;
+}
 
 Napi::Value testRenderingThread (const Napi::CallbackInfo& info)
 {
-	return Napi::Boolean::New(info.Env(), rendernig_thread_handle != nullptr);
+	return Napi::Boolean::New(info.Env(), rendering_thread_handle);
 }
 
 void runRenderingThread (const Napi::CallbackInfo& info)
 {
-	rendernig_thread_handle = new std::thread { rendernig_thread };
+	if (rendering_thread_handle)
+	{
+		render_flag = 0;
+
+		rendering_thread_handle->join();
+
+		render_flag = 1;
+	}
+
+	std::string api = info[0].As<Napi::String>().Utf8Value();
+
+	if (api == "opengl")
+	{
+		rendering_thread_handle = new std::thread { initOpengl };
+	}
+	else if (api == "vulkan")
+	{
+		rendering_thread_handle = new std::thread { initVulkan };
+	}
 }
 
 void stopRenderingThread (const Napi::CallbackInfo& info)
 {
-	delete rendernig_thread_handle;
+	if (rendering_thread_handle)
+	{
+		render_flag = 0;
+
+		rendering_thread_handle->join();
+
+		render_flag = 1;
+	}
+
+	delete rendering_thread_handle;
 }
 
 Napi::Value getPixelDataStorageIsAllocated (const Napi::CallbackInfo& info)
 {
-	return Napi::Boolean::New(info.Env(), renderer_native->pixel_data != nullptr);
+	return Napi::Boolean::New(info.Env(), renderer_native && renderer_native->pixel_data);
 }
 
 Napi::Value getRendererSize (const Napi::CallbackInfo& info)
@@ -104,6 +161,8 @@ Napi::Object Init (Napi::Env env, Napi::Object exports)
 	EXPORT_FUNCTION(getPixelDataStorageIsAllocated);
 	EXPORT_FUNCTION(getRendererSize);
 	EXPORT_FUNCTION(getPixelDataStorage);
+	EXPORT_FUNCTION(getOpenglVersionString);
+	EXPORT_FUNCTION(getVulkanVersionString);
 	// EXPORT_FUNCTION_VOID(rotateOrbitJs);
 
 	return exports;

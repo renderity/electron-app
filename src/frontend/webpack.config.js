@@ -93,7 +93,7 @@ module.exports = (env) =>
 					test: /\.cpp$/,
 					use:
 					{
-						loader: '../../../cpp-webpack-loader/src/index.js',
+						loader: '../../../cpp-webpack-loader/index.js',
 
 						options:
 						{

@@ -20,6 +20,10 @@ const
 
 
 
+// app.commandLine.appendArgument('--experimental-wasm-simd');
+
+
+
 // const RS_TEST_SRC = path.join(__dirname, '../../test/src');
 // const PATH_ADDONS_NODE_API_TEST_SRC = path.join(__dirname, 'addons/test-cpp/src');
 

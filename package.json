@@ -7,6 +7,7 @@
     "electron-prebuilt-compile": "8.2.0"
   },
   "dependencies": {
+    "electron": "latest",
     "electron-compile": "^6.4.4",
     "electron-squirrel-startup": "^1.0.0",
     "chokidar": "latest"
@@ -16,7 +17,8 @@
     "build:addon:test-cpp": "cd src/addons/test-cpp && npm run build && cd ../../../",
     "start:frontend": "cd src/frontend && npm start",
     "build:frontend": "cd src/frontend && npm run build && cd ../../",
-    "start": "__ELECTRON_LOCAL__=true electron-forge start",
+    "start": "__ELECTRON_LOCAL__=true electron .",
+    "_start": "__ELECTRON_LOCAL__=true electron-forge start",
     "start-win": "set __ELECTRON_LOCAL__=true && electron-forge start",
     "package": "npm run build:addon:test-cpp && npm run build:frontend && electron-forge package",
     "make": "electron-forge make",

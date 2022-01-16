@@ -3,16 +3,12 @@
 	{
 		"clang-wasm32":
 		{
-			"FLAGS_ADD": "-matomics -mbulk-memory",
-
 			"LIBS": "/home/denis/libs",
 			"REPS": "/home/denis/reps"
 		},
 
 		"clang-wasm64":
 		{
-			"FLAGS_ADD": "-matomics -mbulk-memory",
-
 			"LIBS": "/home/denis/libs",
 			"REPS": "/home/denis/reps"
 		}
@@ -30,7 +26,7 @@
 			"$(REPS)/renderity"
 		],
 
-		"flags": "$(STD_20) $(NO_LINK) $(VERBOSE) $(OPT_FASTX) $(SSE) $(FLAGS_ADD)",
+		"flags": "$(STD_20) $(NO_LINK) $(VERBOSE) $(OPT_FASTX) $(SSE) $(FLAGS_ADD) -matomics -mbulk-memory",
 
 		"watch_files":
 		[
