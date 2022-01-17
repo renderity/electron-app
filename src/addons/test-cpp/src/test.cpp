@@ -20,6 +20,8 @@
 
 
 
+extern "C" void constructRenderityWrappers (void);
+
 extern void initOpengl (void);
 extern void initVulkan (const size_t& = 0);
 
@@ -33,14 +35,12 @@ extern size_t render_flag;
 
 std::thread* rendering_thread_handle {};
 
-Napi::Value getOpenglVersionString (const Napi::CallbackInfo& info)
+Napi::Value getApiInfoOpengl (const Napi::CallbackInfo& info)
 {
 	return Napi::String::New(info.Env(), RDTY::OPENGL::RendererBase::test());
 }
 
-std::vector<size_t> vulkan_physical_device_indices {};
-
-Napi::Value getVulkanVersionString (const Napi::CallbackInfo& info)
+Napi::Value getApiInfoVulkan (const Napi::CallbackInfo& info)
 {
 	std::map<std::string, size_t> physical_devices { RDTY::VULKAN::RendererBase::test() };
 
@@ -48,8 +48,6 @@ Napi::Value getVulkanVersionString (const Napi::CallbackInfo& info)
 
 	for (const auto& [ name, handle ] : physical_devices)
 	{
-		vulkan_physical_device_indices.push_back(handle);
-
 		result.Set(name, handle);
 	}
 
@@ -61,7 +59,12 @@ Napi::Value testRenderingThread (const Napi::CallbackInfo& info)
 	return Napi::Boolean::New(info.Env(), rendering_thread_handle);
 }
 
-Napi::Value runRenderingThread (const Napi::CallbackInfo& info)
+void _constructRenderityWrappers (const Napi::CallbackInfo& info)
+{
+	constructRenderityWrappers();
+}
+
+void runRenderingThread (const Napi::CallbackInfo& info)
 {
 	if (rendering_thread_handle)
 	{
@@ -80,13 +83,13 @@ Napi::Value runRenderingThread (const Napi::CallbackInfo& info)
 	}
 	else if (api == "vulkan")
 	{
-		rendering_thread_handle = new std::thread { initVulkan, vulkan_physical_device_indices[1] };
-	}
+		size_t vulkan_physical_device_index = (size_t) info[1].As<Napi::Number>().Uint32Value();
 
-	return Napi::Number::New(info.Env(), vulkan_physical_device_indices[1]);
+		rendering_thread_handle = new std::thread { initVulkan, vulkan_physical_device_index };
+	}
 }
 
-void stopRenderingThread (const Napi::CallbackInfo& info)
+void terminateRenderingThread (const Napi::CallbackInfo& info)
 {
 	if (rendering_thread_handle)
 	{
@@ -98,9 +101,11 @@ void stopRenderingThread (const Napi::CallbackInfo& info)
 	}
 
 	delete rendering_thread_handle;
+
+	rendering_thread_handle = nullptr;
 }
 
-Napi::Value getPixelDataStorageIsAllocated (const Napi::CallbackInfo& info)
+Napi::Value testPixelDataStorageIsAllocated (const Napi::CallbackInfo& info)
 {
 	return Napi::Boolean::New(info.Env(), renderer_native && renderer_native->pixel_data);
 }
@@ -153,13 +158,14 @@ Napi::Object Init (Napi::Env env, Napi::Object exports)
 	using VoidCallback = void (*) (const Napi::CallbackInfo&);
 
 	EXPORT_FUNCTION(testRenderingThread);
-	EXPORT_FUNCTION(runRenderingThread);
-	EXPORT_FUNCTION_VOID(stopRenderingThread);
-	EXPORT_FUNCTION(getPixelDataStorageIsAllocated);
+	EXPORT_FUNCTION_VOID(_constructRenderityWrappers);
+	EXPORT_FUNCTION_VOID(runRenderingThread);
+	EXPORT_FUNCTION_VOID(terminateRenderingThread);
+	EXPORT_FUNCTION(testPixelDataStorageIsAllocated);
 	EXPORT_FUNCTION(getRendererSize);
 	EXPORT_FUNCTION(getPixelDataStorage);
-	EXPORT_FUNCTION(getOpenglVersionString);
-	EXPORT_FUNCTION(getVulkanVersionString);
+	EXPORT_FUNCTION(getApiInfoOpengl);
+	EXPORT_FUNCTION(getApiInfoVulkan);
 	// EXPORT_FUNCTION_VOID(rotateOrbitJs);
 
 	return exports;

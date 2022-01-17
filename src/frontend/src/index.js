@@ -31,7 +31,7 @@ const dat_gui = new dat.GUI();
 
 const gui_options =
 {
-	API: 'webgl',
+	API: null,
 };
 
 const gui_options_API = {};
@@ -424,51 +424,301 @@ window.addEventListener
 
 
 
+		let electron_canvas_context = null;
+		let electron_image_data = null;
+		let electron_animation_frame = null;
+
+		{
+			const
+				{
+					// testRenderingThread,
+					// runRenderingThread,
+					// terminateRenderingThread,
+					// testPixelDataStorageIsAllocated,
+					_constructRenderityWrappers,
+					// getRendererSize,
+					// getPixelDataStorage,
+					// // rotateOrbitJs,
+					getApiInfoOpengl,
+					getApiInfoVulkan,
+				}	= window.__CPP_MODULE__;
+
+			// const rotateOrbit = (evt) =>
+			// {
+			// 	rotateOrbitJs(-evt.movementX * 0.01, -evt.movementY * 0.01);
+			// };
+
+			// const stopOrbitRotation = () =>
+			// {
+			// 	window.removeEventListener('mousemove', rotateOrbit);
+			// 	window.removeEventListener('mouseup', stopOrbitRotation);
+			// };
+
+			// canvas.addEventListener
+			// (
+			// 	'mousedown',
+
+			// 	() =>
+			// 	{
+			// 		window.addEventListener('mousemove', rotateOrbit);
+			// 		window.addEventListener('mouseup', stopOrbitRotation);
+			// 	},
+			// );
+
+			// window.addEventListener('mouseup', stopOrbitRotation);
+
+			const api_info_opengl = getApiInfoOpengl();
+			const api_info_vulkan = getApiInfoVulkan();
+
+
+
+			if (api_info_opengl || Object.keys(api_info_vulkan).length)
+			{
+				_constructRenderityWrappers();
+
+				const canvas = document.querySelector('#offscreen');
+
+				electron_canvas_context = canvas.getContext('2d');
+
+				if (api_info_opengl)
+				{
+					gui_options_API.OpenGL = 'opengl';
+				}
+
+				if (Object.keys(api_info_vulkan).length)
+				{
+					Object.keys(api_info_vulkan).forEach
+					(
+						(key) =>
+						{
+							gui_options_API[`Vulkan ${ key }`] = `vulkan${ api_info_vulkan[key] }`;
+						},
+					);
+				}
+			}
+		}
+
+
+
 		dat_gui
 			.add(gui_options, 'API', gui_options_API)
 			.onChange
 			(
-				(value) =>
+				async (value) =>
 				{
-					if (renderer_native)
-					{
-						renderer_native.endLoop();
-						renderer_native.destroy();
+					const
+						{
+							runRenderingThread,
+							terminateRenderingThread,
+							testPixelDataStorageIsAllocated,
+							getRendererSize,
+							getPixelDataStorage,
+						}	= window.__CPP_MODULE__;
 
-						renderer_native.canvas.parentNode.style.display = 'none';
-					}
+					const testPixelDataStorageIsAllocatedSync = (testing_interval = 1000) =>
+					{
+						let interval = null;
+
+						return new Promise
+						(
+							(resolve) =>
+							{
+								interval =
+									setInterval
+									(
+										() =>
+										{
+											if (testPixelDataStorageIsAllocated())
+											{
+												clearInterval(interval);
+
+												resolve();
+											}
+										},
+
+										testing_interval,
+									);
+							},
+						);
+					};
+
+
 
 					switch (value)
 					{
 					case 'webgl':
 					{
+						if (renderer_native)
+						{
+							renderer_native.endLoop();
+							renderer_native.destroy();
+
+							renderer_native.canvas.parentNode.style.display = 'none';
+
+							document.querySelector('#offscreen').parentNode.style.display = 'none';
+						}
+
 						useWebgl();
+
+						renderer_native.canvas.parentNode.style.display = 'block';
+
+						renderer_native.startLoop();
 
 						break;
 					}
+
+
 
 					case 'webgl2':
 					{
+						if (renderer_native)
+						{
+							renderer_native.endLoop();
+							renderer_native.destroy();
+
+							renderer_native.canvas.parentNode.style.display = 'none';
+
+							document.querySelector('#offscreen').parentNode.style.display = 'none';
+						}
+
+
 						useWebgl2();
+
+						renderer_native.canvas.parentNode.style.display = 'block';
+
+						renderer_native.startLoop();
 
 						break;
 					}
+
+
 
 					case 'webgpu':
 					{
+						if (renderer_native)
+						{
+							renderer_native.endLoop();
+							renderer_native.destroy();
+
+							renderer_native.canvas.parentNode.style.display = 'none';
+
+							document.querySelector('#offscreen').parentNode.style.display = 'none';
+						}
+
+
 						useWebgpu();
+
+						renderer_native.canvas.parentNode.style.display = 'block';
+
+						renderer_native.startLoop();
 
 						break;
 					}
 
-					default:
+
+
+					case 'opengl':
+					{
+						cancelAnimationFrame(electron_animation_frame);
+
+						if (renderer_native)
+						{
+							renderer_native.endLoop();
+							renderer_native.destroy();
+
+							renderer_native.canvas.parentNode.style.display = 'none';
+						}
+
+						terminateRenderingThread();
+
+						runRenderingThread('opengl');
+
+						await testPixelDataStorageIsAllocatedSync();
+
+						const pixel_data_storage = getPixelDataStorage();
+
+						const { renderer_width, renderer_height } = getRendererSize();
+
+						const canvas = document.querySelector('#offscreen');
+						canvas.width = renderer_width;
+						canvas.height = renderer_height;
+						canvas.style.width = `${ renderer_width }px`;
+						canvas.style.height = `${ renderer_height }px`;
+
+						electron_image_data = electron_canvas_context.createImageData(renderer_width, renderer_height);
+
+						const render = () =>
+						{
+							electron_image_data.data.set(pixel_data_storage);
+
+							electron_canvas_context.putImageData(electron_image_data, 0, 0);
+
+							electron_animation_frame = requestAnimationFrame(render);
+						};
+
+						render();
+
+						document.querySelector('#offscreen').parentNode.style.display = 'block';
+
+						break;
 					}
 
-					renderer_native.canvas.parentNode.style.display = 'block';
 
-					renderer_native.startLoop();
+
+					default:
+					{
+						if (value.includes('vulkan'))
+						{
+							cancelAnimationFrame(electron_animation_frame);
+
+							if (renderer_native)
+							{
+								renderer_native.endLoop();
+								renderer_native.destroy();
+
+								renderer_native.canvas.parentNode.style.display = 'none';
+							}
+
+							terminateRenderingThread();
+
+							const vulkan_physical_device_index = parseInt(value.replace('vulkan', ''), 10);
+
+							runRenderingThread('vulkan', vulkan_physical_device_index);
+
+							await testPixelDataStorageIsAllocatedSync();
+
+							const pixel_data_storage = getPixelDataStorage();
+
+							const { renderer_width, renderer_height } = getRendererSize();
+
+							const canvas = document.querySelector('#offscreen');
+							canvas.width = renderer_width;
+							canvas.height = renderer_height;
+							canvas.style.width = `${ renderer_width }px`;
+							canvas.style.height = `${ renderer_height }px`;
+
+							electron_image_data =
+								electron_canvas_context.createImageData(renderer_width, renderer_height);
+
+							const render = () =>
+							{
+								electron_image_data.data.set(pixel_data_storage);
+
+								electron_canvas_context.putImageData(electron_image_data, 0, 0);
+
+								electron_animation_frame = requestAnimationFrame(render);
+							};
+
+							render();
+
+							document.querySelector('#offscreen').parentNode.style.display = 'block';
+						}
+					}
+					}
 				},
 			);
+
+
 
 		{
 			if (renderer_webgpu)
@@ -512,117 +762,5 @@ window.addEventListener
 		setTimeout(wasm.exports.startTransition2, 4000);
 
 		// setInterval(wasm.exports.logStacks, 100);
-	},
-);
-
-
-
-const
-	{
-		testRenderingThread,
-		runRenderingThread,
-		getPixelDataStorageIsAllocated,
-		getRendererSize,
-		getPixelDataStorage,
-		// rotateOrbitJs,
-		getOpenglVersionString,
-		getVulkanVersionString,
-	}	= window.__CPP_MODULE__;
-
-
-
-// const rotateOrbit = (evt) =>
-// {
-// 	rotateOrbitJs(-evt.movementX * 0.01, -evt.movementY * 0.01);
-// };
-
-// const stopOrbitRotation = () =>
-// {
-// 	window.removeEventListener('mousemove', rotateOrbit);
-// 	window.removeEventListener('mouseup', stopOrbitRotation);
-// };
-
-// canvas.addEventListener
-// (
-// 	'mousedown',
-
-// 	() =>
-// 	{
-// 		window.addEventListener('mousemove', rotateOrbit);
-// 		window.addEventListener('mouseup', stopOrbitRotation);
-// 	},
-// );
-
-// window.addEventListener('mouseup', stopOrbitRotation);
-
-
-
-window.addEventListener
-(
-	'load',
-
-	async () =>
-	{
-		// Redundant? Does reloading of window cause killing of all processes and
-		// threads spawned from them, so rendering thread does never exist
-		// after reloading?
-		await LOG(getOpenglVersionString());
-		await LOG(getVulkanVersionString());
-
-		if (!testRenderingThread())
-		{
-			runRenderingThread('vulkan');
-		}
-
-		let interval = null;
-
-		await new Promise
-		(
-			(resolve) =>
-			{
-				interval =
-					setInterval
-					(
-						() =>
-						{
-							if (getPixelDataStorageIsAllocated())
-							{
-								clearInterval(interval);
-
-								resolve();
-							}
-						},
-
-						1000,
-					);
-			},
-		);
-
-		const { renderer_width, renderer_height } = getRendererSize();
-
-		const canvas = document.querySelector('#offscreen');
-		canvas.width = renderer_width;
-		canvas.height = renderer_height;
-		canvas.style.width = `${ renderer_width }px`;
-		canvas.style.height = `${ renderer_height }px`;
-
-		const canvas_context = canvas.getContext('2d');
-
-		const image_data = canvas_context.createImageData(renderer_width, renderer_height);
-
-		const pixel_data_storage = getPixelDataStorage();
-
-		const render = () =>
-		{
-			image_data.data.set(pixel_data_storage);
-
-			canvas_context.putImageData(image_data, 0, 0);
-
-			requestAnimationFrame(render);
-		};
-
-		canvas.parentNode.style.display = 'block';
-
-		render();
 	},
 );
