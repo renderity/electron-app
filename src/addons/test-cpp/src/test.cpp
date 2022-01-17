@@ -9,6 +9,7 @@
 #include <cstring>
 #include <string>
 #include <vector>
+#include <map>
 #include <thread>
 
 #include "napi.h"
@@ -20,7 +21,7 @@
 
 
 extern void initOpengl (void);
-extern void initVulkan (void);
+extern void initVulkan (const size_t& = 0);
 
 
 
@@ -37,25 +38,19 @@ Napi::Value getOpenglVersionString (const Napi::CallbackInfo& info)
 	return Napi::String::New(info.Env(), RDTY::OPENGL::RendererBase::test());
 }
 
+std::vector<size_t> vulkan_physical_device_indices {};
+
 Napi::Value getVulkanVersionString (const Napi::CallbackInfo& info)
 {
-	std::vector<VkPhysicalDevice> physical_devices = RDTY::VULKAN::RendererBase::test();
+	std::map<std::string, size_t> physical_devices { RDTY::VULKAN::RendererBase::test() };
 
-	Napi::Object result = Napi::Object::New(info.Env());
+	Napi::Object result { Napi::Object::New(info.Env()) };
 
-	for (VkPhysicalDevice physical_device : physical_devices)
+	for (const auto& [ name, handle ] : physical_devices)
 	{
-		VkPhysicalDeviceProperties physical_device_properties {};
+		vulkan_physical_device_indices.push_back(handle);
 
-		vkGetPhysicalDeviceProperties(physical_device, &physical_device_properties);
-		// cout << inst.physical_device_count << endl;
-		// cout << pProperties.apiVersion << endl;
-		// cout << pProperties.driverVersion << endl;
-		// cout << pProperties.vendorID << endl;
-		// cout << pProperties.deviceID << endl;
-		// cout << pProperties.deviceType << endl;
-
-		result.Set(std::string(physical_device_properties.deviceName), (size_t) physical_device);
+		result.Set(name, handle);
 	}
 
 	return result;
@@ -66,7 +61,7 @@ Napi::Value testRenderingThread (const Napi::CallbackInfo& info)
 	return Napi::Boolean::New(info.Env(), rendering_thread_handle);
 }
 
-void runRenderingThread (const Napi::CallbackInfo& info)
+Napi::Value runRenderingThread (const Napi::CallbackInfo& info)
 {
 	if (rendering_thread_handle)
 	{
@@ -85,8 +80,10 @@ void runRenderingThread (const Napi::CallbackInfo& info)
 	}
 	else if (api == "vulkan")
 	{
-		rendering_thread_handle = new std::thread { initVulkan };
+		rendering_thread_handle = new std::thread { initVulkan, vulkan_physical_device_indices[1] };
 	}
+
+	return Napi::Number::New(info.Env(), vulkan_physical_device_indices[1]);
 }
 
 void stopRenderingThread (const Napi::CallbackInfo& info)
@@ -156,7 +153,7 @@ Napi::Object Init (Napi::Env env, Napi::Object exports)
 	using VoidCallback = void (*) (const Napi::CallbackInfo&);
 
 	EXPORT_FUNCTION(testRenderingThread);
-	EXPORT_FUNCTION_VOID(runRenderingThread);
+	EXPORT_FUNCTION(runRenderingThread);
 	EXPORT_FUNCTION_VOID(stopRenderingThread);
 	EXPORT_FUNCTION(getPixelDataStorageIsAllocated);
 	EXPORT_FUNCTION(getRendererSize);
