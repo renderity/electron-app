@@ -64,31 +64,6 @@ void _constructRenderityWrappers (const Napi::CallbackInfo& info)
 	constructRenderityWrappers();
 }
 
-void runRenderingThread (const Napi::CallbackInfo& info)
-{
-	if (rendering_thread_handle)
-	{
-		render_flag = 0;
-
-		rendering_thread_handle->join();
-
-		render_flag = 1;
-	}
-
-	std::string api = info[0].As<Napi::String>().Utf8Value();
-
-	if (api == "opengl")
-	{
-		rendering_thread_handle = new std::thread { initOpengl };
-	}
-	else if (api == "vulkan")
-	{
-		size_t vulkan_physical_device_index = (size_t) info[1].As<Napi::Number>().Uint32Value();
-
-		rendering_thread_handle = new std::thread { initVulkan, vulkan_physical_device_index };
-	}
-}
-
 void terminateRenderingThread (const Napi::CallbackInfo& info)
 {
 	if (rendering_thread_handle)
@@ -103,6 +78,28 @@ void terminateRenderingThread (const Napi::CallbackInfo& info)
 	delete rendering_thread_handle;
 
 	rendering_thread_handle = nullptr;
+
+	// renderer_native->pixel_data = nullptr;
+
+	renderer_native = nullptr;
+}
+
+void runRenderingThread (const Napi::CallbackInfo& info)
+{
+	// terminateRenderingThread();
+
+	std::string api = info[0].As<Napi::String>().Utf8Value();
+
+	if (api == "opengl")
+	{
+		rendering_thread_handle = new std::thread { initOpengl };
+	}
+	else if (api == "vulkan")
+	{
+		size_t vulkan_physical_device_index = (size_t) info[1].As<Napi::Number>().Uint32Value();
+
+		rendering_thread_handle = new std::thread { initVulkan, vulkan_physical_device_index };
+	}
 }
 
 Napi::Value testPixelDataStorageIsAllocated (const Napi::CallbackInfo& info)

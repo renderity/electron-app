@@ -57,6 +57,7 @@ const createWindow = () =>
 	// Run frontend as regular web app
 	// deployed on localhost with webpack-dev-server
 	if (process.env.__ELECTRON_LOCAL__)
+	// if (true)
 	{
 		window.toggleDevTools();
 
@@ -69,6 +70,7 @@ const createWindow = () =>
 };
 
 if (process.env.__ELECTRON_LOCAL__)
+// if (true)
 {
 	if (process.platform === 'win32')
 	{

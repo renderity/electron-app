@@ -619,8 +619,6 @@ window.addEventListener
 
 					case 'opengl':
 					{
-						cancelAnimationFrame(electron_animation_frame);
-
 						if (renderer_native)
 						{
 							renderer_native.endLoop();
@@ -628,6 +626,8 @@ window.addEventListener
 
 							renderer_native.canvas.parentNode.style.display = 'none';
 						}
+
+						cancelAnimationFrame(electron_animation_frame);
 
 						terminateRenderingThread();
 
@@ -669,8 +669,6 @@ window.addEventListener
 					{
 						if (value.includes('vulkan'))
 						{
-							cancelAnimationFrame(electron_animation_frame);
-
 							if (renderer_native)
 							{
 								renderer_native.endLoop();
@@ -678,6 +676,8 @@ window.addEventListener
 
 								renderer_native.canvas.parentNode.style.display = 'none';
 							}
+
+							cancelAnimationFrame(electron_animation_frame);
 
 							terminateRenderingThread();
 
