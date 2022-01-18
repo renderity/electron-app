@@ -22,8 +22,8 @@
 
 extern "C" void constructRenderityWrappers (void);
 
-extern void initOpengl (void);
-extern void initVulkan (const size_t& = 0);
+extern void initOpengl (const bool&);
+extern void initVulkan (const bool&, const size_t& = 0);
 
 
 
@@ -92,13 +92,13 @@ void runRenderingThread (const Napi::CallbackInfo& info)
 
 	if (api == "opengl")
 	{
-		rendering_thread_handle = new std::thread { initOpengl };
+		rendering_thread_handle = new std::thread { initOpengl, true };
 	}
 	else if (api == "vulkan")
 	{
 		size_t vulkan_physical_device_index = (size_t) info[1].As<Napi::Number>().Uint32Value();
 
-		rendering_thread_handle = new std::thread { initVulkan, vulkan_physical_device_index };
+		rendering_thread_handle = new std::thread { initVulkan, true, vulkan_physical_device_index };
 	}
 }
 
