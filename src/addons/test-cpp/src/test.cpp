@@ -4,7 +4,7 @@
 
 
 
-#include <cstddef>
+#include <cstddef> // size_t
 #include <cstdint>
 #include <cstring>
 #include <string>
@@ -46,9 +46,9 @@ Napi::Value getApiInfoVulkan (const Napi::CallbackInfo& info)
 
 	Napi::Object result { Napi::Object::New(info.Env()) };
 
-	for (const auto& [ name, handle ] : physical_devices)
+	for (const auto& [ name, index ] : physical_devices)
 	{
-		result.Set(name, handle);
+		result.Set(name, index);
 	}
 
 	return result;
