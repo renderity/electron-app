@@ -3,6 +3,7 @@ eslint-disable
 
 max-statements,
 no-lone-blocks,
+no-magic-numbers,
 */
 
 
@@ -139,6 +140,8 @@ window.addEventListener
 
 
 
+					gl.clearColor(1, 1, 1, 1);
+
 					const b = gl.createBuffer();
 
 					renderer.gpu_resources.push([ 'deleteBuffer', b ]);
@@ -234,6 +237,8 @@ window.addEventListener
 
 
 
+					gl.clearColor(1, 1, 1, 1);
+
 					const b = gl.createBuffer();
 
 					renderer.gpu_resources.push([ 'deleteBuffer', b ]);
@@ -301,14 +306,14 @@ window.addEventListener
 					},
 				);
 
-			if (renderer.exists)
+			const webgpu_adapter = await renderer.init();
+
+			if (renderer.exists && webgpu_adapter)
 			{
 				renderer_webgpu = renderer;
 
 				gui_options_API.WebGPU = 'webgpu';
 				gui_options.API = 'webgpu';
-
-				await renderer.init();
 
 
 
@@ -428,72 +433,68 @@ window.addEventListener
 		let electron_image_data = null;
 		let electron_animation_frame = null;
 
+		if (window.__CPP_MODULE__)
 		{
-			const
-				{
-					// testRenderingThread,
-					// runRenderingThread,
-					// terminateRenderingThread,
-					// testPixelDataStorageIsAllocated,
-					_constructRenderityWrappers,
-					// getRendererSize,
-					// getPixelDataStorage,
-					// // rotateOrbitJs,
-					getApiInfoOpengl,
-					getApiInfoVulkan,
-				}	= window.__CPP_MODULE__;
-
-			// const rotateOrbit = (evt) =>
-			// {
-			// 	rotateOrbitJs(-evt.movementX * 0.01, -evt.movementY * 0.01);
-			// };
-
-			// const stopOrbitRotation = () =>
-			// {
-			// 	window.removeEventListener('mousemove', rotateOrbit);
-			// 	window.removeEventListener('mouseup', stopOrbitRotation);
-			// };
-
-			// canvas.addEventListener
-			// (
-			// 	'mousedown',
-
-			// 	() =>
-			// 	{
-			// 		window.addEventListener('mousemove', rotateOrbit);
-			// 		window.addEventListener('mouseup', stopOrbitRotation);
-			// 	},
-			// );
-
-			// window.addEventListener('mouseup', stopOrbitRotation);
-
-			const api_info_opengl = getApiInfoOpengl();
-			const api_info_vulkan = getApiInfoVulkan();
-
-
-
-			if (api_info_opengl || Object.keys(api_info_vulkan).length)
 			{
-				_constructRenderityWrappers();
+				const
+					{
+						_constructRenderityWrappers,
+						getApiInfoOpengl,
+						getApiInfoVulkan,
+					}	= window.__CPP_MODULE__;
 
-				const canvas = document.querySelector('#offscreen');
+				// const rotateOrbit = (evt) =>
+				// {
+				// 	rotateOrbitJs(-evt.movementX * 0.01, -evt.movementY * 0.01);
+				// };
 
-				electron_canvas_context = canvas.getContext('2d');
+				// const stopOrbitRotation = () =>
+				// {
+				// 	window.removeEventListener('mousemove', rotateOrbit);
+				// 	window.removeEventListener('mouseup', stopOrbitRotation);
+				// };
 
-				if (api_info_opengl)
+				// canvas.addEventListener
+				// (
+				// 	'mousedown',
+
+				// 	() =>
+				// 	{
+				// 		window.addEventListener('mousemove', rotateOrbit);
+				// 		window.addEventListener('mouseup', stopOrbitRotation);
+				// 	},
+				// );
+
+				// window.addEventListener('mouseup', stopOrbitRotation);
+
+				const api_info_opengl = getApiInfoOpengl();
+				const api_info_vulkan = getApiInfoVulkan();
+
+
+
+				if (api_info_opengl || Object.keys(api_info_vulkan).length)
 				{
-					gui_options_API.OpenGL = 'opengl';
-				}
+					_constructRenderityWrappers();
 
-				if (Object.keys(api_info_vulkan).length)
-				{
-					Object.keys(api_info_vulkan).forEach
-					(
-						(key) =>
-						{
-							gui_options_API[`Vulkan ${ key }`] = `vulkan${ api_info_vulkan[key] }`;
-						},
-					);
+					const canvas = document.querySelector('#offscreen');
+
+					electron_canvas_context = canvas.getContext('2d');
+
+					if (api_info_opengl)
+					{
+						gui_options_API.OpenGL = 'opengl';
+					}
+
+					if (Object.keys(api_info_vulkan).length)
+					{
+						Object.keys(api_info_vulkan).forEach
+						(
+							(key) =>
+							{
+								gui_options_API[`Vulkan ${ key }`] = `vulkan${ api_info_vulkan[key] }`;
+							},
+						);
+					}
 				}
 			}
 		}
@@ -513,7 +514,7 @@ window.addEventListener
 							testPixelDataStorageIsAllocated,
 							getRendererSize,
 							getPixelDataStorage,
-						}	= window.__CPP_MODULE__;
+						}	= (window.__CPP_MODULE__ || {});
 
 					const testPixelDataStorageIsAllocatedSync = (testing_interval = 1000) =>
 					{
@@ -581,7 +582,6 @@ window.addEventListener
 							document.querySelector('#offscreen').parentNode.style.display = 'none';
 						}
 
-
 						useWebgl2();
 
 						renderer_native.canvas.parentNode.style.display = 'block';
@@ -604,7 +604,6 @@ window.addEventListener
 
 							document.querySelector('#offscreen').parentNode.style.display = 'none';
 						}
-
 
 						useWebgpu();
 
