@@ -67,7 +67,9 @@
 				"file": "$(REPS)/renderity/aux/build/$(ENV)/output/$(LIB_EXT)/aux.$(LIB_EXT)",
 				"watch_directories": "$(REPS)/renderity/aux/src",
 				"do": "genmake $(ENV) $(REPS)/renderity/aux/genmake.json"
-			}
+			},
+
+			"$(REPS)/renderity/renderers-web/src/aux.cpp"
 		]
 	}
 }
