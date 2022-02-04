@@ -47,9 +47,12 @@ window.addEventListener
 	{
 		const wasm = new WasmWrapper();
 
-		const wasm_memory = new WebAssembly.Memory({ initial: 2, maximum: 2, shared: true });
+		// Use 4gb of memory (65536 pages)
+		const wasm_memory = new WebAssembly.Memory({ initial: 65536, maximum: 65536, shared: true });
 
 		await wasm.init(wasm_code, wasm_memory);
+
+		LOG(wasm.exports_demangled['RDTY::MATH::Mat4::New()']())
 
 		wasm.exports.initTransitionStack();
 		wasm.exports.constructRenderityWrappers();
@@ -82,8 +85,11 @@ window.addEventListener
 
 			(evt) =>
 			{
-				wasm.exports._ZN4RDTY4MATH5Orbit7rotate2Eff(orbit, evt.movementX * 0.01, evt.movementY * 0.01);
-				wasm.exports._ZN4RDTY4MATH5Orbit6updateEv(orbit);
+				wasm.exports_demangled['RDTY::MATH::Orbit::rotate2(float,float)']
+				(orbit, evt.movementX * 0.01, evt.movementY * 0.01);
+
+				wasm.exports_demangled['RDTY::MATH::Orbit::update()'](orbit);
+
 
 				// wasm.exports.startTransition();
 			},
