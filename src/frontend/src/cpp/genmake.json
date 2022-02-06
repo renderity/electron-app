@@ -69,7 +69,7 @@
 				"do": "genmake $(ENV) $(REPS)/renderity/aux/genmake.json"
 			},
 
-			"$(REPS)/renderity/renderers-web/src/aux.cpp"
+			"$(REPS)/renderity/wasm-wrapper/src/aux.cpp"
 		]
 	}
 }
