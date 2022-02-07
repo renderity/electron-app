@@ -9,13 +9,11 @@ no-magic-numbers,
 
 
 import './index.scss';
-import '@babel/polyfill';
 
 import * as dat from 'dat.gui';
 
-import WasmWrapper from '../../../../renderers-web/src/wasm-wrapper.js';
-import WebGL from '../../../../renderers-web/src/webgl-renderer.js';
-import WebGPU from '../../../../renderers-web/src/webgpu-renderer.js';
+import WasmWrapper from '../../../../wasm-wrapper/src/index.js';
+import RdtyRenderers from '../../../../renderers-web/src/index.js';
 
 import wasm_code from './cpp/src/entry-wasm32.cpp';
 
@@ -52,8 +50,6 @@ window.addEventListener
 
 		await wasm.init(wasm_code, wasm_memory);
 
-		LOG(wasm.exports_demangled['RDTY::MATH::Mat4::New()']())
-
 		wasm.exports.initTransitionStack();
 		wasm.exports.constructRenderityWrappers();
 
@@ -76,24 +72,31 @@ window.addEventListener
 
 
 
-		const orbit = wasm.Addr(wasm.exports.orbit.value);
-		// const orbit2 = wasm.Addr(wasm.exports.orbit2.value);
+		{
+			const orbit = wasm.Addr(wasm.exports.orbit.value);
+			// const orbit2 = wasm.Addr(wasm.exports.orbit2.value);
 
-		window.addEventListener
-		(
-			'mousemove',
+			const RDTY_MATH_Orbit_rotate2 = wasm.exports_demangled['RDTY::MATH::Orbit::rotate2(float,float)'];
+			const RDTY_MATH_Orbit_update = wasm.exports_demangled['RDTY::MATH::Orbit::update()'];
 
-			(evt) =>
-			{
-				wasm.exports_demangled['RDTY::MATH::Orbit::rotate2(float,float)']
-				(orbit, evt.movementX * 0.01, evt.movementY * 0.01);
+			window.addEventListener
+			(
+				'mousemove',
 
-				wasm.exports_demangled['RDTY::MATH::Orbit::update()'](orbit);
+				(evt) =>
+				{
+					RDTY_MATH_Orbit_rotate2(orbit, evt.movementX * 0.01, evt.movementY * 0.01);
+					RDTY_MATH_Orbit_update(orbit);
 
 
-				// wasm.exports.startTransition();
-			},
-		);
+					// wasm.exports.startTransition();
+				},
+			);
+		}
+
+
+
+		const rdty_renderers = new RdtyRenderers(wasm);
 
 
 
@@ -107,7 +110,7 @@ window.addEventListener
 		let useWebgl = null;
 
 		{
-			const webgl = new WebGL(wasm);
+			const webgl = new rdty_renderers.WebGL(wasm);
 
 			const renderer =
 				new webgl.Renderer(renderer_addr, document.querySelector('#webgl'), 'webgl');
@@ -200,7 +203,7 @@ window.addEventListener
 		let useWebgl2 = null;
 
 		{
-			const webgl = new WebGL(wasm);
+			const webgl = new rdty_renderers.WebGL(wasm);
 
 			const renderer =
 				new webgl.Renderer(renderer_addr, document.querySelector('#webgl2'), 'webgl2');
@@ -300,7 +303,7 @@ window.addEventListener
 		let useWebgpu = null;
 
 		{
-			const webgpu = new WebGPU(wasm);
+			const webgpu = new rdty_renderers.WebGPU(wasm);
 
 			const renderer =
 				new webgpu.Renderer
@@ -341,8 +344,8 @@ window.addEventListener
 
 
 					const scene = Scene.getInstance(scene_addr);
-					const material = Material.getInstance(material_addr, Material.ShaderUsage.GLSL_VULKAN);
-					const material2 = Material.getInstance(material2_addr, Material.ShaderUsage.GLSL_VULKAN);
+					const material = Material.getInstance(material_addr, Material.ShaderUsage.SPIRV);
+					const material2 = Material.getInstance(material2_addr, Material.ShaderUsage.SPIRV);
 					// const uniform_block0 = UniformBlock.getInstance(uniform_block0_addr);
 					const desc_set1 = DescriptorSet.getInstance(desc_set1_addr);
 					const desc_set2 = DescriptorSet.getInstance(desc_set2_addr);

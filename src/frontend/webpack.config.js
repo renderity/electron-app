@@ -11,7 +11,7 @@ const CopyPlugin = require('copy-webpack-plugin');
 
 module.exports = (env) =>
 	({
-		entry: './src/index.js',
+		entry: [ './node_modules/@babel/runtime/regenerator/index.js', './src/index.js' ],
 
 		target: 'web',
 
@@ -91,15 +91,7 @@ module.exports = (env) =>
 
 				{
 					test: /\.cpp$/,
-					use:
-					{
-						loader: '../../../cpp-webpack-loader/index.js',
-
-						options:
-						{
-							asd: 123,
-						},
-					},
+					use: '../../../cpp-webpack-loader/index.js',
 				},
 			],
 		},
@@ -137,11 +129,9 @@ module.exports = (env) =>
 			}),
 
 			new webpack.DefinePlugin
-			(
-				{
-					LOG: 'console.log',
-				},
-			),
+			({
+				LOG: 'console.log',
+			}),
 		],
 
 		devServer:

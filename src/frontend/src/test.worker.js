@@ -1,6 +1,7 @@
-import '@babel/polyfill';
+// TODO: provide regenerator to workers from webpack?
+import '@babel/runtime/regenerator';
 
-import WasmWrapper from '../../../../renderers-web/src/wasm-wrapper.js';
+import WasmWrapper from '../../../../wasm-wrapper/src/index.js';
 
 
 
