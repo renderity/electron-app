@@ -11,7 +11,7 @@ const CopyPlugin = require('copy-webpack-plugin');
 
 module.exports = (env) =>
 	({
-		entry: [ './node_modules/@babel/runtime/regenerator/index.js', './src/index.js' ],
+		entry: [ '@babel/runtime/regenerator', './src/index.js' ],
 
 		target: 'web',
 
