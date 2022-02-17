@@ -1,11 +1,12 @@
 const fs = require('fs');
 const path = require('path');
 const webpack = require('webpack');
-const HtmlWebpackPlugin = require('html-webpack-plugin');
+const HtmlPlugin = require('html-webpack-plugin');
 const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const OptimizeCSSAssetsPlugin = require('optimize-css-assets-webpack-plugin');
 const CopyPlugin = require('copy-webpack-plugin');
+const CleanTerminalPlugin = require('clean-terminal-webpack-plugin');
 
 
 
@@ -38,7 +39,7 @@ module.exports = (env) =>
 					exclude: /node_modules/,
 
 					use:
-
+					(
 						env.development ?
 
 							[
@@ -53,7 +54,8 @@ module.exports = (env) =>
 							[
 								'babel-loader',
 								'eslint-loader',
-							],
+							]
+					),
 				},
 
 				{
@@ -106,7 +108,7 @@ module.exports = (env) =>
 
 			new OptimizeCSSAssetsPlugin({}),
 
-			new HtmlWebpackPlugin
+			new HtmlPlugin
 			(
 				{
 					filename: path.join(__dirname, 'build/index.html'),
@@ -132,6 +134,8 @@ module.exports = (env) =>
 			({
 				LOG: 'console.log',
 			}),
+
+			new CleanTerminalPlugin({ beforeCompile: true }),
 		],
 
 		devServer:
