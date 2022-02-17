@@ -90,7 +90,7 @@ window.addEventListener
 					RDTY_MATH_Orbit_update(orbit);
 
 
-					// wasm_wrapper.exports.startTransition();
+					wasm_wrapper.exports.startTransition();
 				},
 			);
 		}
@@ -115,18 +115,19 @@ window.addEventListener
 		object_base.updateVertexData(geom.attributes.position.array);
 		object_base.updateIndexData(geom.index.array);
 
-		wasm_wrapper.exports_demangled['RDTY::WRAPPERS::Scene::addObject(RDTY::WRAPPERS::Object*)']
-		(scene_addr, object_addr);
-
-
-
 		const object2_base = rdty_renderers.ObjectBase.getInstance(object2_addr);
 
 		object2_base.updateVertexData(geom2.attributes.position.array);
 		object2_base.updateIndexData(geom2.index.array);
 
-		wasm_wrapper.exports_demangled['RDTY::WRAPPERS::Scene::addObject(RDTY::WRAPPERS::Object*)']
-		(scene_addr, object2_addr);
+		// wasm_wrapper.exports_demangled['RDTY::WRAPPERS::Scene::addObject(RDTY::WRAPPERS::Object*)']
+		// (scene_addr, object_addr);
+		// wasm_wrapper.exports_demangled['RDTY::WRAPPERS::Scene::addObject(RDTY::WRAPPERS::Object*)']
+		// (scene_addr, object2_addr);
+
+
+
+		wasm_wrapper.exports.constructRenderityWrappers2();
 
 
 
@@ -784,8 +785,8 @@ window.addEventListener
 
 		// updateOrbit();
 
-		setTimeout(wasm_wrapper.exports.startTransition, 3000);
-		setTimeout(wasm_wrapper.exports.startTransition2, 4000);
+		// setTimeout(wasm_wrapper.exports.startTransition, 3000);
+		// setTimeout(wasm_wrapper.exports.startTransition2, 4000);
 
 		// setInterval(wasm_wrapper.exports.logStacks, 100);
 	},
@@ -803,6 +804,28 @@ window.addEventListener
 	{
 		float data [];
 	} box_tree_float
+
+
+
+	layout (std430, set = 0, binding = 0) buffer ScenePositionData
+	{
+		float data [];
+	} scene_position_data;
+
+	layout (std430, set = 0, binding = 0) buffer SceneNormalData
+	{
+		float data [];
+	} scene_normal_data;
+
+	layout (std430, set = 0, binding = 0) buffer SceneColorData
+	{
+		float data [];
+	} scene_color_data;
+
+	layout (std430, set = 0, binding = 0) buffer SceneIndexData
+	{
+		float data [];
+	} scene_index_data;
 
 
 
@@ -1125,25 +1148,25 @@ window.addEventListener
 					p1 =
 						vec3
 						(
-							position_data[vertex1_x_coord_index],
-							position_data[vertex1_x_coord_index + 1],
-							position_data[vertex1_x_coord_index + 2]
+							scene_position_data[vertex1_x_coord_index],
+							scene_position_data[vertex1_x_coord_index + 1],
+							scene_position_data[vertex1_x_coord_index + 2]
 						);
 
 					p2 =
 						vec3
 						(
-							position_data[vertex2_x_coord_index],
-							position_data[vertex2_x_coord_index + 1],
-							position_data[vertex2_x_coord_index + 2]
+							scene_position_data[vertex2_x_coord_index],
+							scene_position_data[vertex2_x_coord_index + 1],
+							scene_position_data[vertex2_x_coord_index + 2]
 						);
 
 					p3 =
 						vec3
 						(
-							position_data[vertex3_x_coord_index],
-							position_data[vertex3_x_coord_index + 1],
-							position_data[vertex3_x_coord_index + 2]
+							scene_position_data[vertex3_x_coord_index],
+							scene_position_data[vertex3_x_coord_index + 1],
+							scene_position_data[vertex3_x_coord_index + 2]
 						);
 
 					if (!getRayTriangleIntersection(ray, p1, p2, p3, false, intersection))
@@ -1441,7 +1464,7 @@ window.addEventListener
 
 // 	if (DdN > 0)
 // 	{
-// 		if (backfaceCulling) return null;
+// 		if (backfaceCulling) return false;
 // 		sign = 1;
 // 	}
 // 	else if (DdN < 0)
@@ -1451,7 +1474,7 @@ window.addEventListener
 // 	}
 // 	else
 // 	{
-// 		return null;
+// 		return false;
 // 	}
 
 // 	// _v3.subVectors(this.origin, a);
@@ -1463,7 +1486,7 @@ window.addEventListener
 // 	// b1 < 0, no intersection
 // 	if (DdQxE2 < 0)
 // 	{
-// 		return null;
+// 		return false;
 // 	}
 
 // 	// const DdE1xQ = sign * ray_direction.dot(_v1.cross(_v3));
@@ -1473,13 +1496,13 @@ window.addEventListener
 // 	// b2 < 0, no intersection
 // 	if (DdE1xQ < 0)
 // 	{
-// 		return null;
+// 		return false;
 // 	}
 
 // 	// b1+b2 > 1, no intersection
 // 	if (DdQxE2 + DdE1xQ > DdN)
 // 	{
-// 		return null;
+// 		return false;
 // 	}
 
 // 	// Line intersects triangle, check if ray does.
@@ -1489,13 +1512,15 @@ window.addEventListener
 // 	// t < 0, no intersection
 // 	if (QdN < 0)
 // 	{
-// 		return null;
+// 		return false;
 // 	}
 
 // 	// Ray intersects triangle.
 // 	vcopy(target, ray_direction);
 // 	vmuls(target, QdN / DdN);
 // 	vadd(target, target, ray_origin);
+
+// 	return true;
 // };
 
 
@@ -1897,7 +1922,12 @@ window.addEventListener
 // 					p3[1] = this.position_data[vertex3_x_coord_index + 1];
 // 					p3[2] = this.position_data[vertex3_x_coord_index + 2];
 
-// 					getRayTriangleIntersection(ray_origin, ray_direction, p1, p2, p3, false, intersection);
+// 					if (!getRayTriangleIntersection(ray_origin, ray_direction, p1, p2, p3, false, intersection))
+// 					{
+// 						continue;
+// 					}
+
+// 					// getRayTriangleIntersection(ray_origin, ray_direction, p1, p2, p3, false, intersection)
 
 // 					const ray_origin_to_intersection_distance = vdist(ray_origin, intersection);
 
@@ -2021,16 +2051,16 @@ window.addEventListener
 // 		ray_direction[2] = rc.ray.direction.z;
 
 // 		// sphere_object.bounding_box.search(ray_origin, ray_direction, 0);
-// 		// const t = Date.now();
-// 		// for (let i = 0; i < 256; ++i)
-// 		// {
+// 		const t = Date.now();
+// 		for (let i = 0; i < 1024; ++i)
+// 		{
 // 			nearest_ray_triangle_intersection = Infinity;
 // 			vcopy(intersection, ray_origin);
 // 			sphere_object.search(ray_origin, ray_direction, 0);
 // 			pointer.position.set(...intersection);
 // 			pointer.position.applyMatrix4(sphere_obj.matrixWorld);
-// 		// }
-// 		// LOG(Date.now() - t)
+// 		}
+// 		LOG(Date.now() - t)
 // 	},
 // );
 
