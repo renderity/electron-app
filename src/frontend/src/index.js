@@ -1557,7 +1557,7 @@ const p3p2 = [ 0, 0, 0 ];
 
 class BoxTree
 {
-	static level_max = 4;
+	static level_num = 4;
 
 
 
@@ -1627,7 +1627,7 @@ class BoxTree
 
 			split (level)
 			{
-				if (level + 1 > BoxTree.level_max)
+				if (level === BoxTree.level_num)
 				{
 					return;
 				}
@@ -1700,7 +1700,7 @@ class BoxTree
 
 
 
-				if (level + 1 > BoxTree.level_max)
+				if (level === BoxTree.level_num)
 				{
 					return;
 				}
@@ -1709,68 +1709,6 @@ class BoxTree
 
 				this.boxes.forEach((box) => box.pushTriangle(triangle_index, level + 1));
 			}
-
-			// search (ray_origin, ray_direction, level)
-			// {
-			// 	const targ = getRayBoxIntersection(ray_origin, ray_direction, this.min, this.max, intersection_box);
-
-			// 	if (targ && vdist(ray_origin, intersection_box) < nearest_ray_triangle_intersection)
-			// 	// if (testRayBoxIntersection(ray_origin, ray_direction, this.min, this.max))
-			// 	{
-			// 		// ++zxc;
-			// 		if (level + 1 > BoxTree.level_max)
-			// 		{
-			// 			this.triangles.forEach
-			// 			(
-			// 				(triangle_index) =>
-			// 				{
-			// 					const vertex1_index = _object.index_data[(triangle_index * 3) + 0];
-			// 					const vertex2_index = _object.index_data[(triangle_index * 3) + 1];
-			// 					const vertex3_index = _object.index_data[(triangle_index * 3) + 2];
-
-			// 					p1[0] = _object.position_data[(vertex1_index * 3) + 0];
-			// 					p1[1] = _object.position_data[(vertex1_index * 3) + 1];
-			// 					p1[2] = _object.position_data[(vertex1_index * 3) + 2];
-
-			// 					p2[0] = _object.position_data[(vertex2_index * 3) + 0];
-			// 					p2[1] = _object.position_data[(vertex2_index * 3) + 1];
-			// 					p2[2] = _object.position_data[(vertex2_index * 3) + 2];
-
-			// 					p3[0] = _object.position_data[(vertex3_index * 3) + 0];
-			// 					p3[1] = _object.position_data[(vertex3_index * 3) + 1];
-			// 					p3[2] = _object.position_data[(vertex3_index * 3) + 2];
-
-			// 					getRayTriangleIntersection(ray_origin, ray_direction, p1, p2, p3, false, intersection);
-
-			// 					const ray_origin_to_intersection_distance = vdist(ray_origin, intersection);
-
-			// 					if (ray_origin_to_intersection_distance < nearest_ray_triangle_intersection && ray_origin_to_intersection_distance > 0.001)
-			// 					{
-			// 						nearest_ray_triangle_intersection = ray_origin_to_intersection_distance;
-			// 						// tri_index = triangle_index;
-			// 						pointer.position.set(...intersection);
-			// 					}
-			// 				},
-			// 			);
-
-			// 			return;
-			// 		}
-
-			// 		// this.boxes.forEach((box) => box.search(ray_origin, ray_direction, level + 1));
-
-			// 		for (let i = 0, i_max = this.boxes.length; i < i_max; ++i)
-			// 		{
-			// 			const box = this.boxes[i];
-
-			// 			if (box.triangles.length === 0)
-			// 			{
-			// 				break;
-			// 			}
-
-			// 			box.search(ray_origin, ray_direction, level + 1);
-			// 		}
-			// 	}
-			// }
 
 			serialize (offset)
 			{
@@ -2077,13 +2015,16 @@ window.addEventListener
 			// sphere_object.search(ray_origin, ray_direction, 0);
 
 
-			// let triangles_count = 0;
 
-
+			// LOG(BoxTree.level_num)
 			let current_level = 0;
-			let box_offsets = [ null, null, null, null, null, null, null, null ];
-			let box_sizes = [ 0, 0, 0, 0, 0, 0, 0, 0 ];
-			let box_counters = [ 0, 0, 0, 0, 0, 0, 0, 0 ];
+			const box_sizes = new Uint32Array(BoxTree.level_num + 2);
+			const box_counters = new Uint32Array(BoxTree.level_num + 2);
+			const box_offsets = new Uint32Array((BoxTree.level_num + 2) * 8);
+
+			box_sizes[0] = 1;
+
+			// let max_level = -Infinity;
 
 			let box_offset = 0;
 
@@ -2134,7 +2075,6 @@ window.addEventListener
 							p3[1] = sphere_object.position_data[vertex3_x_coord_index + 1];
 							p3[2] = sphere_object.position_data[vertex3_x_coord_index + 2];
 
-							// ++triangles_count;
 							if (!getRayTriangleIntersection(ray_origin, ray_direction, p1, p2, p3, false, intersection))
 							{
 								continue;
@@ -2149,7 +2089,7 @@ window.addEventListener
 						}
 					}
 
-					if (current_level !== 0 && box_counters[current_level] >= box_sizes[current_level] + 1)
+					if (box_counters[current_level] > box_sizes[current_level])
 					{
 						--current_level;
 
@@ -2162,12 +2102,16 @@ window.addEventListener
 					{
 						++current_level;
 
-						box_offsets[current_level] = sphere_object.data_ui32.subarray(box_offset + 9, box_offset + 9 + box_count);
+						for (let i = 0; i < box_count; ++i)
+						{
+							box_offsets[(current_level * 8) + i] = sphere_object.data_ui32[box_offset + 9 + i];
+						}
+
 						box_sizes[current_level] = box_count;
 						box_counters[current_level] = 0;
 					}
 
-					box_offset = box_offsets[current_level][box_counters[current_level]];
+					box_offset = box_offsets[(current_level * 8) + box_counters[current_level]];
 
 					continue;
 				}
@@ -2177,25 +2121,26 @@ window.addEventListener
 					break;
 				}
 
-				if (box_counters[current_level] >= box_sizes[current_level] + 1)
+				if (box_counters[current_level] > box_sizes[current_level])
 				{
 					--current_level;
 
+					// Remove ?
 					if (current_level === 0)
 					{
 						break;
 					}
 				}
 
-				box_offset = box_offsets[current_level][box_counters[current_level]];
+				box_offset = box_offsets[(current_level * 8) + box_counters[current_level]];
 			}
-
-			// LOG(triangles_count)
 
 
 
 			pointer.position.set(...intersection);
 			pointer.position.applyMatrix4(sphere_obj.matrixWorld);
+
+			// LOG('max_level', max_level)
 		// }
 		// LOG(Date.now() - t)
 	},
