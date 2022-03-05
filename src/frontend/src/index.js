@@ -552,7 +552,7 @@ window.addEventListener
 
 
 
-			const dimension_segment_count = 8;
+			const dimension_segment_count = 32;
 
 			const testRayBoxIntersection = (ray_origin, ray_direction, box_min, box_max) =>
 			{
@@ -1015,7 +1015,8 @@ window.addEventListener
 							view: context_texture.createView(),
 							// GPUTextureView resolveTarget;
 
-							loadValue: [ 1, 1, 1, 1 ],
+							clearValue: [ 1, 1, 1, 1 ],
+							loadOp: 'clear',
 							storeOp: 'store',
 						},
 					],
@@ -1030,7 +1031,7 @@ window.addEventListener
 
 			surface_object.draw2();
 
-			renderer.render_pass_encoder.endPass();
+			renderer.render_pass_encoder.end();
 
 			const command_buffer = command_encoder.finish();
 
@@ -1086,7 +1087,7 @@ window.addEventListener
 
 // const pointer = new THREE.Mesh(new THREE.SphereGeometry(2, 32, 16), new THREE.MeshBasicMaterial({ wireframe: false, color: 'blue' }));
 
-// const dimension_segment_count = 16;
+// const dimension_segment_count = 8;
 // const pointer2 = new THREE.Mesh(new THREE.BoxGeometry(30 / dimension_segment_count, 30 / dimension_segment_count, 30 / dimension_segment_count), new THREE.MeshBasicMaterial({ wireframe: false, color: 'blue' }));
 
 // scene.add(pointer);
@@ -1647,16 +1648,16 @@ window.addEventListener
 
 
 
-// 					if (triangle_end - triangle_start !== 0)
-// 					{
-// 						const size = max[0] - min[0];
+// 					// if (triangle_end - triangle_start !== 0)
+// 					// {
+// 					// 	const size = max[0] - min[0];
 
-// 						const box = new THREE.Mesh(new THREE.BoxGeometry(size, size, size), new THREE.MeshBasicMaterial({ wireframe: true, color: 'green' }));
+// 					// 	const box = new THREE.Mesh(new THREE.BoxGeometry(size, size, size), new THREE.MeshBasicMaterial({ wireframe: true, color: 'green' }));
 
-// 						box.position.set((max[0] + min[0]) * 0.5, (max[1] + min[1]) * 0.5, (max[2] + min[2]) * 0.5);
+// 					// 	box.position.set((max[0] + min[0]) * 0.5, (max[1] + min[1]) * 0.5, (max[2] + min[2]) * 0.5);
 
-// 						scene.add(box);
-// 					}
+// 					// 	scene.add(box);
+// 					// }
 // 					// else
 // 					// {
 // 					// 	LOG(x, y, z)
@@ -1682,7 +1683,11 @@ window.addEventListener
 
 
 
-// const sphere = new THREE.SphereGeometry(15, 128, 128);
+// const sphere = new THREE.SphereGeometry(15, 64, 64);
+
+// const sph = new THREE.Mesh(sphere, new THREE.MeshBasicMaterial({ color: 'red', wireframe: true }));
+
+// scene.add(sph);
 
 // const sphere_object = new BoxTree(sphere.attributes.position.array, sphere.index.array);
 
@@ -1702,7 +1707,7 @@ window.addEventListener
 
 // 	(evt) =>
 // 	{
-// 		LOG('start')
+// 		// LOG('start')
 // 		mouse.x = ((evt.clientX / window.innerWidth) * 2) - 1;
 // 		mouse.y = (-(evt.clientY / window.innerHeight) * 2) + 1;
 
@@ -1745,7 +1750,7 @@ window.addEventListener
 // 				y === dimension_segment_count && (--y);
 // 				z === dimension_segment_count && (--z);
 
-// 				LOG(x, y, z)
+// 				// LOG(x, y, z)
 
 // 				let box_index = (x * dimension_segment_count * dimension_segment_count + y * dimension_segment_count + z) * 8;
 
@@ -1767,7 +1772,7 @@ window.addEventListener
 // 				{
 // 					if (i >= 100)
 // 					{
-// 						LOG('break 100')
+// 						// LOG('break 100')
 // 						break;
 // 					}
 
@@ -1776,7 +1781,7 @@ window.addEventListener
 
 // 					if (triangle_start < triangle_end)
 // 					{
-// 						LOG('triangles', triangle_end - triangle_start)
+// 						// LOG('triangles', triangle_end - triangle_start)
 // 						let qwe = 0;
 
 // 						for (; triangle_start < triangle_end; ++triangle_start)
@@ -1832,65 +1837,10 @@ window.addEventListener
 // 							pointer.position.set(...intersection);
 // 							pointer2.position.set((min[0] + max[0]) * 0.5, (min[1] + max[1]) * 0.5, (min[2] + max[2]) * 0.5);
 
-// 							LOG('break intersect', i)
+// 							// LOG('break intersect', i)
 // 							break;
 // 						}
 // 					}
-
-// 					getRayBoxIntersection(ray_origin, ray_direction, min, max, intersection_box, intersection_box_far);
-
-// 					if
-// 					(
-// 						vdist(intersection_box_far, intersection_box_far1) < 0.000001
-// 					)
-// 					{
-// 						LOG('break far', i)
-// 						break;
-// 					}
-
-// 					// x = Math.floor((intersection_box_far[0] + (size * 0.5)) / segment_size);
-// 					// y = Math.floor((intersection_box_far[1] + (size * 0.5)) / segment_size);
-// 					// z = Math.floor((intersection_box_far[2] + (size * 0.5)) / segment_size);
-
-// 					if (Math.abs(intersection_box_far[0] - min[0]) < 0.000001)
-// 					{
-// 						--x;
-// 					}
-// 					else if (Math.abs(intersection_box_far[0] - max[0]) < 0.000001)
-// 					{
-// 						++x;
-// 					}
-
-// 					if (Math.abs(intersection_box_far[1] - min[1]) < 0.000001)
-// 					{
-// 						--y;
-// 					}
-// 					else if (Math.abs(intersection_box_far[1] - max[1]) < 0.000001)
-// 					{
-// 						++y;
-// 					}
-
-// 					if (Math.abs(intersection_box_far[2] - min[2]) < 0.000001)
-// 					{
-// 						--z;
-// 					}
-// 					else if (Math.abs(intersection_box_far[2] - max[2]) < 0.000001)
-// 					{
-// 						++z;
-// 					}
-
-// 					x === -1 && (++x);
-// 					y === -1 && (++y);
-// 					z === -1 && (++z);
-
-// 					x === dimension_segment_count && (--x);
-// 					y === dimension_segment_count && (--y);
-// 					z === dimension_segment_count && (--z);
-
-// 					LOG(x, y, z)
-
-// 					// next box index
-// 					box_index = (x * dimension_segment_count * dimension_segment_count + y * dimension_segment_count + z) * 8;
 
 // 					min[0] = sphere_object.data_f32[box_index + 0];
 // 					min[1] = sphere_object.data_f32[box_index + 1];
@@ -1899,6 +1849,91 @@ window.addEventListener
 // 					max[0] = sphere_object.data_f32[box_index + 3];
 // 					max[1] = sphere_object.data_f32[box_index + 4];
 // 					max[2] = sphere_object.data_f32[box_index + 5];
+
+// 					getRayBoxIntersection(ray_origin, ray_direction, min, max, intersection_box, intersection_box_far);
+
+// 					if
+// 					(
+// 						vdist(intersection_box_far, intersection_box_far1) < 0.000001
+// 					)
+// 					{
+// 						// LOG('break far', i)
+// 						break;
+// 					}
+
+// 					// x = Math.floor((intersection_box_far[0] + (size * 0.5)) / segment_size);
+// 					// y = Math.floor((intersection_box_far[1] + (size * 0.5)) / segment_size);
+// 					// z = Math.floor((intersection_box_far[2] + (size * 0.5)) / segment_size);
+
+// 					const aa = min.map((val, val_index) => (intersection_box_far[val_index] - val));
+// 					const bb = max.map((val, val_index) => (intersection_box_far[val_index] - val));
+
+// 					// LOG(...aa, '___', ...bb)
+
+// 					// x -= 1 - Number(Boolean(aa[0] / aa[0]));
+// 					// x += 1 - Number(Boolean(bb[0] / bb[0]));
+
+// 					// y -= 1 - Number(Boolean(aa[1] / aa[1]));
+// 					// y += 1 - Number(Boolean(bb[1] / bb[1]));
+
+// 					// z -= 1 - Number(Boolean(aa[2] / aa[2]));
+// 					// z += 1 - Number(Boolean(bb[2] / bb[2]));
+
+// 					x += Number(Boolean(aa[0] / aa[0])) - Number(Boolean(bb[0] / bb[0]));
+// 					y += Number(Boolean(aa[1] / aa[1])) - Number(Boolean(bb[1] / bb[1]));
+// 					z += Number(Boolean(aa[2] / aa[2])) - Number(Boolean(bb[2] / bb[2]));
+
+// 					// xyz += (aa / aa) - (bb / bb);
+
+// 					LOG(x, y, z)
+
+// 					// if (Math.abs(intersection_box_far[0] - min[0]) < 0.000001)
+// 					// {
+// 					// 	--x;
+// 					// }
+// 					// else if (Math.abs(intersection_box_far[0] - max[0]) < 0.000001)
+// 					// {
+// 					// 	++x;
+// 					// }
+
+// 					// if (Math.abs(intersection_box_far[1] - min[1]) < 0.000001)
+// 					// {
+// 					// 	--y;
+// 					// }
+// 					// else if (Math.abs(intersection_box_far[1] - max[1]) < 0.000001)
+// 					// {
+// 					// 	++y;
+// 					// }
+
+// 					// if (Math.abs(intersection_box_far[2] - min[2]) < 0.000001)
+// 					// {
+// 					// 	--z;
+// 					// }
+// 					// else if (Math.abs(intersection_box_far[2] - max[2]) < 0.000001)
+// 					// {
+// 					// 	++z;
+// 					// }
+
+// 					// x === -1 && (++x);
+// 					// y === -1 && (++y);
+// 					// z === -1 && (++z);
+
+// 					// x === dimension_segment_count && (--x);
+// 					// y === dimension_segment_count && (--y);
+// 					// z === dimension_segment_count && (--z);
+
+// 					// LOG(x, y, z)
+
+// 					// next box index
+// 					box_index = (x * dimension_segment_count * dimension_segment_count + y * dimension_segment_count + z) * 8;
+
+// 					// min[0] = sphere_object.data_f32[box_index + 0];
+// 					// min[1] = sphere_object.data_f32[box_index + 1];
+// 					// min[2] = sphere_object.data_f32[box_index + 2];
+
+// 					// max[0] = sphere_object.data_f32[box_index + 3];
+// 					// max[1] = sphere_object.data_f32[box_index + 4];
+// 					// max[2] = sphere_object.data_f32[box_index + 5];
 // 				}
 // 			}
 
