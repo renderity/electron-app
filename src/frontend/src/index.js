@@ -767,6 +767,13 @@ window.addEventListener
 						}
 					}
 
+					const _min = Math.max(Math.max(Math.abs(min[0]), Math.abs(min[1])), Math.abs(min[2]));
+					const _max = Math.max(Math.max(Math.abs(max[0]), Math.abs(max[1])), Math.abs(max[2]));
+					const __max = Math.max(_min, _max);
+
+					min.fill(-__max);
+					max.fill(__max);
+
 					this.min = min;
 					this.max = max;
 				}
@@ -830,11 +837,14 @@ window.addEventListener
 
 
 
-			const sphere = new THREE.SphereGeometry(10, 64, 64);
+			// const sphere = new THREE.SphereGeometry(10, 64, 64);
+			const sphere = new THREE.TorusKnotGeometry(10, 3, 40, 16);
+			LOG(sphere)
 
 			const sphere_object = new BoxTree(sphere.attributes.position.array, sphere.index.array);
 
 			sphere_object.makeBoundingBox();
+			LOG(sphere_object)
 			sphere_object.test();
 
 			tree_data = sphere_object.data_ui32;
@@ -1072,13 +1082,16 @@ window.addEventListener
 
 // controls.update();
 
+// // const sphere = new THREE.SphereGeometry(15, 64, 64);
+// const sphere = new THREE.TorusGeometry(15, 3, 200, 16);
+
 // const pointer = new THREE.Mesh(new THREE.SphereGeometry(2, 32, 16), new THREE.MeshBasicMaterial({ wireframe: false, color: 'blue' }));
 
 // const dimension_segment_count = 8;
 // const pointer2 = new THREE.Mesh(new THREE.BoxGeometry(30 / dimension_segment_count, 30 / dimension_segment_count, 30 / dimension_segment_count), new THREE.MeshBasicMaterial({ wireframe: false, color: 'blue' }));
 
 // scene.add(pointer);
-// // scene.add(pointer2);
+// scene.add(pointer2);
 
 // let nearest_ray_triangle_intersection = Infinity;
 
@@ -1481,9 +1494,9 @@ window.addEventListener
 
 // const testTriangle = (triangle_index, min, max, _object) =>
 // {
-// 	const vertex1_index = _object.index_data[(triangle_index * 3) + 0];
-// 	const vertex2_index = _object.index_data[(triangle_index * 3) + 1];
-// 	const vertex3_index = _object.index_data[(triangle_index * 3) + 2];
+// 	const vertex1_index = _object.index_data[(triangle_index) + 0];
+// 	const vertex2_index = _object.index_data[(triangle_index) + 1];
+// 	const vertex3_index = _object.index_data[(triangle_index) + 2];
 
 // 	p1[0] = _object.position_data[(vertex1_index * 3) + 0];
 // 	p1[1] = _object.position_data[(vertex1_index * 3) + 1];
@@ -1590,6 +1603,13 @@ window.addEventListener
 // 			}
 // 		}
 
+// 		const _min = Math.max(Math.max(Math.abs(min[0]), Math.abs(min[1])), Math.abs(min[2]));
+// 		const _max = Math.max(Math.max(Math.abs(max[0]), Math.abs(max[1])), Math.abs(max[2]));
+// 		const __max = Math.max(_min, _max);
+
+// 		min.fill(-__max);
+// 		max.fill(__max);
+
 // 		this.min = min;
 // 		this.max = max;
 // 	}
@@ -1623,7 +1643,7 @@ window.addEventListener
 
 // 					const triangle_start = this.triangle_count;
 
-// 					for (let i = 0, i_max = this.index_data.length / 3; i < i_max; ++i)
+// 					for (let i = 0, i_max = this.index_data.length; i < i_max; i += 3)
 // 					{
 // 						if (testTriangle(i, min, max, this))
 // 						{
@@ -1635,20 +1655,20 @@ window.addEventListener
 
 
 
-// 					// if (triangle_end - triangle_start !== 0)
-// 					// {
-// 					// 	const size = max[0] - min[0];
+// 					if (triangle_end - triangle_start !== 0)
+// 					{
+// 						const size = max[0] - min[0];
 
-// 					// 	const box = new THREE.Mesh(new THREE.BoxGeometry(size, size, size), new THREE.MeshBasicMaterial({ wireframe: true, color: 'green' }));
+// 						const box = new THREE.Mesh(new THREE.BoxGeometry(size, size, size), new THREE.MeshBasicMaterial({ wireframe: true, color: 'green' }));
 
-// 					// 	box.position.set((max[0] + min[0]) * 0.5, (max[1] + min[1]) * 0.5, (max[2] + min[2]) * 0.5);
+// 						box.position.set((max[0] + min[0]) * 0.5, (max[1] + min[1]) * 0.5, (max[2] + min[2]) * 0.5);
 
-// 					// 	scene.add(box);
-// 					// }
-// 					// else
-// 					// {
-// 					// 	LOG(x, y, z)
-// 					// }
+// 						scene.add(box);
+// 					}
+// 					else
+// 					{
+// 						LOG(x, y, z)
+// 					}
 
 
 
@@ -1670,8 +1690,6 @@ window.addEventListener
 
 
 
-// const sphere = new THREE.SphereGeometry(15, 64, 64);
-
 // const sph = new THREE.Mesh(sphere, new THREE.MeshBasicMaterial({ color: 'red', wireframe: true }));
 
 // scene.add(sph);
@@ -1680,6 +1698,8 @@ window.addEventListener
 
 // sphere_object.makeBoundingBox();
 // sphere_object.test();
+
+// LOG(sphere_object)
 
 // const mouse = new THREE.Vector2();
 
@@ -1694,7 +1714,6 @@ window.addEventListener
 
 // 	(evt) =>
 // 	{
-// 		// LOG('start')
 // 		mouse.x = ((evt.clientX / window.innerWidth) * 2) - 1;
 // 		mouse.y = (-(evt.clientY / window.innerHeight) * 2) + 1;
 
@@ -1712,22 +1731,174 @@ window.addEventListener
 // 		ray_direction[1] = rc.ray.direction.y;
 // 		ray_direction[2] = rc.ray.direction.z;
 
-// 		// sphere_object.bounding_box.search(ray_origin, ray_direction, 0);
-// 		// const t = Date.now();
-// 		// for (let i = 0; i < 256; ++i)
-// 		// {
-// 			nearest_ray_triangle_intersection = Infinity;
 
-// 			vcopy(intersection, ray_origin);
 
-// 			if (getRayBoxIntersection(ray_origin, ray_direction, sphere_object.min, sphere_object.max, intersection_box, intersection_box_far1))
+// 		nearest_ray_triangle_intersection = Infinity;
+
+// 		vcopy(intersection, ray_origin);
+
+// 		if (getRayBoxIntersection(ray_origin, ray_direction, sphere_object.min, sphere_object.max, intersection_box, intersection_box_far1))
+// 		{
+// 			const size = sphere_object.max[0] - sphere_object.min[0];
+// 			const segment_size = size / dimension_segment_count;
+
+// 			let x = Math.floor((intersection_box[0] + (size * 0.5)) / segment_size);
+// 			let y = Math.floor((intersection_box[1] + (size * 0.5)) / segment_size);
+// 			let z = Math.floor((intersection_box[2] + (size * 0.5)) / segment_size);
+
+// 			x === -1 && (++x);
+// 			y === -1 && (++y);
+// 			z === -1 && (++z);
+
+// 			x === dimension_segment_count && (--x);
+// 			y === dimension_segment_count && (--y);
+// 			z === dimension_segment_count && (--z);
+
+
+
+// 			let box_index = (x * dimension_segment_count * dimension_segment_count + y * dimension_segment_count + z) * 8;
+
+// 			const min = new Float32Array(3);
+
+// 			min[0] = sphere_object.data_f32[box_index + 0];
+// 			min[1] = sphere_object.data_f32[box_index + 1];
+// 			min[2] = sphere_object.data_f32[box_index + 2];
+
+// 			const max = new Float32Array(3);
+
+// 			max[0] = sphere_object.data_f32[box_index + 3];
+// 			max[1] = sphere_object.data_f32[box_index + 4];
+// 			max[2] = sphere_object.data_f32[box_index + 5];
+
+// 			let i = 0;
+
+// 			for (let i = 0; i < dimension_segment_count; ++i)
 // 			{
-// 				const size = sphere_object.max[0] - sphere_object.min[0];
-// 				const segment_size = size / dimension_segment_count;
+// 				let triangle_start = sphere_object.data_ui32[box_index + 6];
+// 				const triangle_end = sphere_object.data_ui32[box_index + 7];
 
-// 				let x = Math.floor((intersection_box[0] + (size * 0.5)) / segment_size);
-// 				let y = Math.floor((intersection_box[1] + (size * 0.5)) / segment_size);
-// 				let z = Math.floor((intersection_box[2] + (size * 0.5)) / segment_size);
+// 				if (triangle_start < triangle_end)
+// 				{
+// 					let qwe = 0;
+
+// 					for (; triangle_start < triangle_end; ++triangle_start)
+// 					{
+// 						const triangle_index = sphere_object.triangles_data[triangle_start];
+
+// 						const triangle_first_point_index = triangle_index;
+
+// 						const vertex1_index = sphere_object.index_data[triangle_first_point_index];
+// 						const vertex2_index = sphere_object.index_data[triangle_first_point_index + 1];
+// 						const vertex3_index = sphere_object.index_data[triangle_first_point_index + 2];
+
+// 						const vertex1_x_coord_index = vertex1_index * 3;
+// 						const vertex2_x_coord_index = vertex2_index * 3;
+// 						const vertex3_x_coord_index = vertex3_index * 3;
+
+// 						p1[0] = sphere_object.position_data[vertex1_x_coord_index];
+// 						p1[1] = sphere_object.position_data[vertex1_x_coord_index + 1];
+// 						p1[2] = sphere_object.position_data[vertex1_x_coord_index + 2];
+
+// 						p2[0] = sphere_object.position_data[vertex2_x_coord_index];
+// 						p2[1] = sphere_object.position_data[vertex2_x_coord_index + 1];
+// 						p2[2] = sphere_object.position_data[vertex2_x_coord_index + 2];
+
+// 						p3[0] = sphere_object.position_data[vertex3_x_coord_index];
+// 						p3[1] = sphere_object.position_data[vertex3_x_coord_index + 1];
+// 						p3[2] = sphere_object.position_data[vertex3_x_coord_index + 2];
+
+// 						if (!getRayTriangleIntersection(ray_origin, ray_direction, p1, p2, p3, false, intersection))
+// 						{
+// 							continue;
+// 						}
+
+// 						++qwe;
+
+// 						const ray_origin_to_intersection_distance = vdist(ray_origin, intersection);
+
+// 						if (ray_origin_to_intersection_distance < nearest_ray_triangle_intersection && ray_origin_to_intersection_distance > 0.001)
+// 						{
+// 							nearest_ray_triangle_intersection = ray_origin_to_intersection_distance;
+// 						}
+// 					}
+
+// 					if (qwe)
+// 					{
+// 						pointer.position.set(...intersection);
+// 						pointer2.position.set((min[0] + max[0]) * 0.5, (min[1] + max[1]) * 0.5, (min[2] + max[2]) * 0.5);
+
+// 						break;
+// 					}
+// 				}
+
+// 				min[0] = sphere_object.data_f32[box_index + 0];
+// 				min[1] = sphere_object.data_f32[box_index + 1];
+// 				min[2] = sphere_object.data_f32[box_index + 2];
+
+// 				max[0] = sphere_object.data_f32[box_index + 3];
+// 				max[1] = sphere_object.data_f32[box_index + 4];
+// 				max[2] = sphere_object.data_f32[box_index + 5];
+
+// 				getRayBoxIntersection(ray_origin, ray_direction, min, max, intersection_box, intersection_box_far);
+
+// 				if
+// 				(
+// 					vdist(intersection_box_far, intersection_box_far1) < 0.00001
+// 				)
+// 				{
+// 					break;
+// 				}
+
+// 				// x = Math.floor((intersection_box_far[0] + (size * 0.5)) / segment_size);
+// 				// y = Math.floor((intersection_box_far[1] + (size * 0.5)) / segment_size);
+// 				// z = Math.floor((intersection_box_far[2] + (size * 0.5)) / segment_size);
+
+// 				// const aa = min.map((val, val_index) => (intersection_box_far[val_index] - val));
+// 				// const bb = max.map((val, val_index) => (intersection_box_far[val_index] - val));
+
+// 				// LOG(...aa, '___', ...bb)
+
+// 				// x -= 1 - Number(Boolean(aa[0] / aa[0]));
+// 				// x += 1 - Number(Boolean(bb[0] / bb[0]));
+
+// 				// y -= 1 - Number(Boolean(aa[1] / aa[1]));
+// 				// y += 1 - Number(Boolean(bb[1] / bb[1]));
+
+// 				// z -= 1 - Number(Boolean(aa[2] / aa[2]));
+// 				// z += 1 - Number(Boolean(bb[2] / bb[2]));
+
+// 				// x += Number(Boolean(aa[0] / aa[0])) - Number(Boolean(bb[0] / bb[0]));
+// 				// y += Number(Boolean(aa[1] / aa[1])) - Number(Boolean(bb[1] / bb[1]));
+// 				// z += Number(Boolean(aa[2] / aa[2])) - Number(Boolean(bb[2] / bb[2]));
+
+// 				// xyz += (aa / aa) - (bb / bb);
+
+// 				if (Math.abs(intersection_box_far[0] - min[0]) < 0.00001)
+// 				{
+// 					--x;
+// 				}
+// 				else if (Math.abs(intersection_box_far[0] - max[0]) < 0.00001)
+// 				{
+// 					++x;
+// 				}
+
+// 				if (Math.abs(intersection_box_far[1] - min[1]) < 0.00001)
+// 				{
+// 					--y;
+// 				}
+// 				else if (Math.abs(intersection_box_far[1] - max[1]) < 0.00001)
+// 				{
+// 					++y;
+// 				}
+
+// 				if (Math.abs(intersection_box_far[2] - min[2]) < 0.00001)
+// 				{
+// 					--z;
+// 				}
+// 				else if (Math.abs(intersection_box_far[2] - max[2]) < 0.00001)
+// 				{
+// 					++z;
+// 				}
 
 // 				x === -1 && (++x);
 // 				y === -1 && (++y);
@@ -1737,198 +1908,14 @@ window.addEventListener
 // 				y === dimension_segment_count && (--y);
 // 				z === dimension_segment_count && (--z);
 
-// 				// LOG(x, y, z)
+// 				LOG(x, y, z)
 
-// 				let box_index = (x * dimension_segment_count * dimension_segment_count + y * dimension_segment_count + z) * 8;
-
-// 				const min = new Float32Array(3);
-
-// 				min[0] = sphere_object.data_f32[box_index + 0];
-// 				min[1] = sphere_object.data_f32[box_index + 1];
-// 				min[2] = sphere_object.data_f32[box_index + 2];
-
-// 				const max = new Float32Array(3);
-
-// 				max[0] = sphere_object.data_f32[box_index + 3];
-// 				max[1] = sphere_object.data_f32[box_index + 4];
-// 				max[2] = sphere_object.data_f32[box_index + 5];
-
-// 				let i = 0;
-
-// 				for (;; ++i)
-// 				{
-// 					if (i >= 100)
-// 					{
-// 						// LOG('break 100')
-// 						break;
-// 					}
-
-// 					let triangle_start = sphere_object.data_ui32[box_index + 6];
-// 					const triangle_end = sphere_object.data_ui32[box_index + 7];
-
-// 					if (triangle_start < triangle_end)
-// 					{
-// 						// LOG('triangles', triangle_end - triangle_start)
-// 						let qwe = 0;
-
-// 						for (; triangle_start < triangle_end; ++triangle_start)
-// 						{
-// 							const triangle_index = sphere_object.triangles_data[triangle_start];
-
-// 							const triangle_first_point_index = triangle_index * 3;
-
-// 							const vertex1_index = sphere_object.index_data[triangle_first_point_index];
-// 							const vertex2_index = sphere_object.index_data[triangle_first_point_index + 1];
-// 							const vertex3_index = sphere_object.index_data[triangle_first_point_index + 2];
-
-// 							const vertex1_x_coord_index = vertex1_index * 3;
-// 							const vertex2_x_coord_index = vertex2_index * 3;
-// 							const vertex3_x_coord_index = vertex3_index * 3;
-
-// 							p1[0] = sphere_object.position_data[vertex1_x_coord_index];
-// 							p1[1] = sphere_object.position_data[vertex1_x_coord_index + 1];
-// 							p1[2] = sphere_object.position_data[vertex1_x_coord_index + 2];
-
-// 							p2[0] = sphere_object.position_data[vertex2_x_coord_index];
-// 							p2[1] = sphere_object.position_data[vertex2_x_coord_index + 1];
-// 							p2[2] = sphere_object.position_data[vertex2_x_coord_index + 2];
-
-// 							p3[0] = sphere_object.position_data[vertex3_x_coord_index];
-// 							p3[1] = sphere_object.position_data[vertex3_x_coord_index + 1];
-// 							p3[2] = sphere_object.position_data[vertex3_x_coord_index + 2];
-
-// 							if (!getRayTriangleIntersection(ray_origin, ray_direction, p1, p2, p3, false, intersection))
-// 							{
-// 								continue;
-// 							}
-
-// 							++qwe;
-
-// 							const ray_origin_to_intersection_distance = vdist(ray_origin, intersection);
-
-// 							if (ray_origin_to_intersection_distance < nearest_ray_triangle_intersection && ray_origin_to_intersection_distance > 0.001)
-// 							{
-// 								nearest_ray_triangle_intersection = ray_origin_to_intersection_distance;
-// 							}
-// 						}
-
-// 						// if (i === 0)
-// 						// {
-// 						// 	pointer2.position.set((min[0] + max[0]) * 0.5, (min[1] + max[1]) * 0.5, (min[2] + max[2]) * 0.5);
-// 						// }
-
-// 						// LOG(qwe)
-
-// 						if (qwe)
-// 						{
-// 							pointer.position.set(...intersection);
-// 							pointer2.position.set((min[0] + max[0]) * 0.5, (min[1] + max[1]) * 0.5, (min[2] + max[2]) * 0.5);
-
-// 							// LOG('break intersect', i)
-// 							break;
-// 						}
-// 					}
-
-// 					min[0] = sphere_object.data_f32[box_index + 0];
-// 					min[1] = sphere_object.data_f32[box_index + 1];
-// 					min[2] = sphere_object.data_f32[box_index + 2];
-
-// 					max[0] = sphere_object.data_f32[box_index + 3];
-// 					max[1] = sphere_object.data_f32[box_index + 4];
-// 					max[2] = sphere_object.data_f32[box_index + 5];
-
-// 					getRayBoxIntersection(ray_origin, ray_direction, min, max, intersection_box, intersection_box_far);
-
-// 					if
-// 					(
-// 						vdist(intersection_box_far, intersection_box_far1) < 0.000001
-// 					)
-// 					{
-// 						// LOG('break far', i)
-// 						break;
-// 					}
-
-// 					// x = Math.floor((intersection_box_far[0] + (size * 0.5)) / segment_size);
-// 					// y = Math.floor((intersection_box_far[1] + (size * 0.5)) / segment_size);
-// 					// z = Math.floor((intersection_box_far[2] + (size * 0.5)) / segment_size);
-
-// 					const aa = min.map((val, val_index) => (intersection_box_far[val_index] - val));
-// 					const bb = max.map((val, val_index) => (intersection_box_far[val_index] - val));
-
-// 					// LOG(...aa, '___', ...bb)
-
-// 					// x -= 1 - Number(Boolean(aa[0] / aa[0]));
-// 					// x += 1 - Number(Boolean(bb[0] / bb[0]));
-
-// 					// y -= 1 - Number(Boolean(aa[1] / aa[1]));
-// 					// y += 1 - Number(Boolean(bb[1] / bb[1]));
-
-// 					// z -= 1 - Number(Boolean(aa[2] / aa[2]));
-// 					// z += 1 - Number(Boolean(bb[2] / bb[2]));
-
-// 					x += Number(Boolean(aa[0] / aa[0])) - Number(Boolean(bb[0] / bb[0]));
-// 					y += Number(Boolean(aa[1] / aa[1])) - Number(Boolean(bb[1] / bb[1]));
-// 					z += Number(Boolean(aa[2] / aa[2])) - Number(Boolean(bb[2] / bb[2]));
-
-// 					// xyz += (aa / aa) - (bb / bb);
-
-// 					LOG(x, y, z)
-
-// 					// if (Math.abs(intersection_box_far[0] - min[0]) < 0.000001)
-// 					// {
-// 					// 	--x;
-// 					// }
-// 					// else if (Math.abs(intersection_box_far[0] - max[0]) < 0.000001)
-// 					// {
-// 					// 	++x;
-// 					// }
-
-// 					// if (Math.abs(intersection_box_far[1] - min[1]) < 0.000001)
-// 					// {
-// 					// 	--y;
-// 					// }
-// 					// else if (Math.abs(intersection_box_far[1] - max[1]) < 0.000001)
-// 					// {
-// 					// 	++y;
-// 					// }
-
-// 					// if (Math.abs(intersection_box_far[2] - min[2]) < 0.000001)
-// 					// {
-// 					// 	--z;
-// 					// }
-// 					// else if (Math.abs(intersection_box_far[2] - max[2]) < 0.000001)
-// 					// {
-// 					// 	++z;
-// 					// }
-
-// 					// x === -1 && (++x);
-// 					// y === -1 && (++y);
-// 					// z === -1 && (++z);
-
-// 					// x === dimension_segment_count && (--x);
-// 					// y === dimension_segment_count && (--y);
-// 					// z === dimension_segment_count && (--z);
-
-// 					// LOG(x, y, z)
-
-// 					// next box index
-// 					box_index = (x * dimension_segment_count * dimension_segment_count + y * dimension_segment_count + z) * 8;
-
-// 					// min[0] = sphere_object.data_f32[box_index + 0];
-// 					// min[1] = sphere_object.data_f32[box_index + 1];
-// 					// min[2] = sphere_object.data_f32[box_index + 2];
-
-// 					// max[0] = sphere_object.data_f32[box_index + 3];
-// 					// max[1] = sphere_object.data_f32[box_index + 4];
-// 					// max[2] = sphere_object.data_f32[box_index + 5];
-// 				}
+// 				// next box index
+// 				box_index = (x * dimension_segment_count * dimension_segment_count + y * dimension_segment_count + z) * 8;
 // 			}
+// 		}
 
-// 			renderer.render(scene, camera);
-
-// 			// LOG('max_level', max_level)
-// 		// }
-// 		// LOG(Date.now() - t)
+// 		renderer.render(scene, camera);
 // 	},
 // );
 
