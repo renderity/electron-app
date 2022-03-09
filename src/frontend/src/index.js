@@ -552,7 +552,7 @@ window.addEventListener
 
 
 
-			const dimension_segment_count = 32;
+			const dimension_segment_count = 16;
 
 			const testRayBoxIntersection = (ray_origin, ray_direction, box_min, box_max) =>
 			{
@@ -658,9 +658,9 @@ window.addEventListener
 
 			const testTriangle = (triangle_index, min, max, _object) =>
 			{
-				const vertex1_index = _object.index_data[(triangle_index * 3) + 0];
-				const vertex2_index = _object.index_data[(triangle_index * 3) + 1];
-				const vertex3_index = _object.index_data[(triangle_index * 3) + 2];
+				const vertex1_index = _object.index_data[(triangle_index) + 0];
+				const vertex2_index = _object.index_data[(triangle_index) + 1];
+				const vertex3_index = _object.index_data[(triangle_index) + 2];
 
 				p1[0] = _object.position_data[(vertex1_index * 3) + 0];
 				p1[1] = _object.position_data[(vertex1_index * 3) + 1];
@@ -800,7 +800,7 @@ window.addEventListener
 
 								const triangle_start = this.triangle_count;
 
-								for (let i = 0, i_max = this.index_data.length / 3; i < i_max; ++i)
+								for (let i = 0, i_max = this.index_data.length; i < i_max; i += 3)
 								{
 									if (testTriangle(i, min, max, this))
 									{
@@ -809,19 +809,6 @@ window.addEventListener
 								}
 
 								const triangle_end = this.triangle_count;
-
-
-
-								// if (triangle_end - triangle_start !== 0)
-								// {
-								// 	const size = max[0] - min[0];
-
-								// 	const box = new THREE.Mesh(new THREE.BoxGeometry(size, size, size), new THREE.MeshBasicMaterial({ wireframe: true, color: 'green' }));
-
-								// 	box.position.set((max[0] + min[0]) * 0.5, (max[1] + min[1]) * 0.5, (max[2] + min[2]) * 0.5);
-
-								// 	scene.add(box);
-								// }
 
 
 
@@ -1091,7 +1078,7 @@ window.addEventListener
 // const pointer2 = new THREE.Mesh(new THREE.BoxGeometry(30 / dimension_segment_count, 30 / dimension_segment_count, 30 / dimension_segment_count), new THREE.MeshBasicMaterial({ wireframe: false, color: 'blue' }));
 
 // scene.add(pointer);
-// scene.add(pointer2);
+// // scene.add(pointer2);
 
 // let nearest_ray_triangle_intersection = Infinity;
 
