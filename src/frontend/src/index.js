@@ -787,13 +787,23 @@ window.addEventListener
 
 					let box_index = 0;
 
+					this.data_f32[box_index + 0] = this.min[0];
+					this.data_f32[box_index + 1] = this.min[1];
+					this.data_f32[box_index + 2] = this.min[2];
+
+					this.data_ui32[box_index + 3] = dimension_segment_count;
+
+					this.data_f32[box_index + 4] = this.max[0];
+					this.data_f32[box_index + 5] = this.max[1];
+					this.data_f32[box_index + 6] = this.max[2];
+
 					for (let x = 0; x < dimension_segment_count; ++x)
 					{
 						for (let y = 0; y < dimension_segment_count; ++y)
 						{
 							for (let z = 0; z < dimension_segment_count; ++z)
 							{
-								box_index = (x * dimension_segment_count * dimension_segment_count + y * dimension_segment_count + z) * 8;
+								box_index = (x * dimension_segment_count * dimension_segment_count + y * dimension_segment_count + z + 1) * 8;
 
 								min[0] = this.min[0] + (step * x);
 								min[1] = this.min[1] + (step * y);
@@ -811,7 +821,7 @@ window.addEventListener
 								{
 									if (testTriangle(i, min, max, this))
 									{
-										this.triangles_data[this.triangle_count++] = i;
+										this.triangles_data[this.triangle_count++] = i / 3;
 									}
 								}
 
@@ -823,11 +833,12 @@ window.addEventListener
 								this.data_f32[box_index + 1] = min[1];
 								this.data_f32[box_index + 2] = min[2];
 
-								this.data_f32[box_index + 3] = max[0];
-								this.data_f32[box_index + 4] = max[1];
-								this.data_f32[box_index + 5] = max[2];
+								this.data_ui32[box_index + 3] = triangle_start;
 
-								this.data_ui32[box_index + 6] = triangle_start;
+								this.data_f32[box_index + 4] = max[0];
+								this.data_f32[box_index + 5] = max[1];
+								this.data_f32[box_index + 6] = max[2];
+
 								this.data_ui32[box_index + 7] = triangle_end;
 							}
 						}
@@ -837,8 +848,10 @@ window.addEventListener
 
 
 
-			// const sphere = new THREE.SphereGeometry(10, 64, 64);
-			const sphere = new THREE.TorusKnotGeometry(10, 3, 40, 16);
+			const sphere = new THREE.SphereGeometry(10, 64, 64);
+			// const sphere = new THREE.TorusKnotGeometry(10, 3, 320, 32);
+			// const sphere = new THREE.TorusKnotGeometry(5, 1.5, 80, 16);
+			// const sphere = new THREE.BoxGeometry(20, 20, 20, 32, 32, 32);
 			LOG(sphere)
 
 			const sphere_object = new BoxTree(sphere.attributes.position.array, sphere.index.array);
@@ -854,8 +867,26 @@ window.addEventListener
 
 			const object_base = rdty_renderers.ObjectBase.getInstance(object_addr);
 
-			object_base.updateVertexData(sphere.attributes.position.array);
-			object_base.updateIndexData(sphere.index.array);
+			const _pos = new Float32Array(sphere.attributes.position.array.length / 3 * 4);
+
+			for (let i = 0; i < sphere.attributes.position.array.length / 3; ++i)
+			{
+				_pos[(i * 4) + 0] = sphere.attributes.position.array[(i * 3) + 0];
+				_pos[(i * 4) + 1] = sphere.attributes.position.array[(i * 3) + 1];
+				_pos[(i * 4) + 2] = sphere.attributes.position.array[(i * 3) + 2];
+			}
+
+			const _ind = new Uint32Array(sphere.index.array.length / 3 * 4);
+
+			for (let i = 0; i < sphere.index.array.length / 3; ++i)
+			{
+				_ind[(i * 4) + 0] = sphere.index.array[(i * 3) + 0];
+				_ind[(i * 4) + 1] = sphere.index.array[(i * 3) + 1];
+				_ind[(i * 4) + 2] = sphere.index.array[(i * 3) + 2];
+			}
+
+			object_base.updateVertexData(_pos);
+			object_base.updateIndexData(_ind);
 		}
 		/* eslint-enable */
 		/*
@@ -1083,11 +1114,12 @@ window.addEventListener
 // controls.update();
 
 // // const sphere = new THREE.SphereGeometry(15, 64, 64);
-// const sphere = new THREE.TorusGeometry(15, 3, 200, 16);
+// // const sphere = new THREE.TorusGeometry(15, 3, 200, 16);
+// const sphere = new THREE.TorusKnotGeometry(10, 3, 80, 16);
 
 // const pointer = new THREE.Mesh(new THREE.SphereGeometry(2, 32, 16), new THREE.MeshBasicMaterial({ wireframe: false, color: 'blue' }));
 
-// const dimension_segment_count = 8;
+// const dimension_segment_count = 16;
 // const pointer2 = new THREE.Mesh(new THREE.BoxGeometry(30 / dimension_segment_count, 30 / dimension_segment_count, 30 / dimension_segment_count), new THREE.MeshBasicMaterial({ wireframe: false, color: 'blue' }));
 
 // scene.add(pointer);
