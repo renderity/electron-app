@@ -73,7 +73,7 @@ window.addEventListener
 					RDTY_MATH_Orbit_update(orbit);
 
 
-					// wasm_wrapper.exports.startTransition();
+					wasm_wrapper.exports.startTransition();
 				},
 			);
 		}
@@ -89,469 +89,6 @@ window.addEventListener
 		let tri_data = null;
 
 		{
-			// const child_centers1 = new Float32Array(8);
-			// const child_centers2 = new Float32Array(8);
-			// const child_centers3 = new Float32Array(8);
-			// const child_centers4 = new Float32Array(8);
-			// const child_centers5 = new Float32Array(8);
-			// const child_centers6 = new Float32Array(8);
-			// const child_centers7 = new Float32Array(8);
-			// const child_centers8 = new Float32Array(8);
-
-
-
-			// const vsub = (target, a, b) =>
-			// {
-			// 	target[0] = a[0] - b[0];
-			// 	target[1] = a[1] - b[1];
-			// 	target[2] = a[2] - b[2];
-			// };
-
-			// const testRayBoxIntersection = (ray_origin, ray_direction, box_min, box_max) =>
-			// {
-			// 	let tmin = (box_min[0] - ray_origin[0]) / ray_direction[0];
-			// 	let tmax = (box_max[0] - ray_origin[0]) / ray_direction[0];
-
-			// 	if (tmin > tmax)
-			// 	{
-			// 		const _tmp = tmin;
-			// 		tmin = tmax;
-			// 		tmax = _tmp;
-			// 	}
-
-			// 	let tymin = (box_min[1] - ray_origin[1]) / ray_direction[1];
-			// 	let tymax = (box_max[1] - ray_origin[1]) / ray_direction[1];
-
-			// 	if (tymin > tymax)
-			// 	{
-			// 		const _tmp = tymin;
-			// 		tymin = tymax;
-			// 		tymax = _tmp;
-			// 	}
-
-			// 	if ((tmin > tymax) || (tymin > tmax))
-			// 	{
-			// 		return false;
-			// 	}
-
-			// 	if (tymin > tmin)
-			// 	{
-			// 		tmin = tymin;
-			// 	}
-
-			// 	if (tymax < tmax)
-			// 	{
-			// 		tmax = tymax;
-			// 	}
-
-			// 	let tzmin = (box_min[2] - ray_origin[2]) / ray_direction[2];
-			// 	let tzmax = (box_max[2] - ray_origin[2]) / ray_direction[2];
-
-			// 	if (tzmin > tzmax)
-			// 	{
-			// 		const _tmp = tzmin;
-			// 		tzmin = tzmax;
-			// 		tzmax = _tmp;
-			// 	}
-
-			// 	if ((tmin > tzmax) || (tzmin > tmax))
-			// 	{
-			// 		return false;
-			// 	}
-
-			// 	if (tzmin > tmin)
-			// 	{
-			// 		tmin = tzmin;
-			// 	}
-
-			// 	if (tzmax < tmax)
-			// 	{
-			// 		tmax = tzmax;
-			// 	}
-
-			// 	return ((tmin < 1000) && (tmax > 0));
-			// };
-
-
-
-			// const p1 = new Float32Array(3);
-			// const p2 = new Float32Array(3);
-			// const p3 = new Float32Array(3);
-			// const p1p2 = new Float32Array(3);
-			// const p1p3 = new Float32Array(3);
-			// const p2p1 = new Float32Array(3);
-			// const p2p3 = new Float32Array(3);
-			// const p3p1 = new Float32Array(3);
-			// const p3p2 = new Float32Array(3);
-
-
-
-			// class BoxTree
-			// {
-			// 	static level_num = 7;
-
-
-
-			// 	constructor (position_data, index_data)
-			// 	{
-			// 		this.position_data = position_data;
-			// 		this.index_data = index_data;
-
-			// 		this.x_min = Infinity;
-			// 		this.x_max = -Infinity;
-			// 		this.y_min = Infinity;
-			// 		this.y_max = -Infinity;
-			// 		this.z_min = Infinity;
-			// 		this.z_max = -Infinity;
-
-			// 		this.bounding_box = null;
-
-
-
-			// 		this._data = new ArrayBuffer(2048 * 1024 * 4);
-			// 		this.data_ui32 = new Uint32Array(this._data);
-			// 		this.data_f32 = new Float32Array(this._data);
-
-
-
-			// 		const _object = this;
-
-			// 		class Box
-			// 		{
-			// 			constructor (min, max)
-			// 			{
-			// 				this.min = min;
-			// 				this.max = max;
-
-			// 				this.boxes = [];
-			// 				this.triangles = [];
-			// 			}
-
-			// 			testPointInsideBox (point)
-			// 			{
-			// 				return Boolean
-			// 				(
-			// 					point[0] <= this.max[0] && point[0] >= this.min[0] &&
-			// 					point[1] <= this.max[1] && point[1] >= this.min[1] &&
-			// 					point[2] <= this.max[2] && point[2] >= this.min[2],
-			// 				);
-			// 			}
-
-			// 			split (level)
-			// 			{
-			// 				if (level === BoxTree.level_num - 1)
-			// 				{
-			// 					return;
-			// 				}
-
-
-
-			// 				const child_size = (this.max[0] - this.min[0]) * 0.5;
-
-			// 				const min = new Float32Array(3);
-			// 				const max = new Float32Array(3);
-
-			// 				min[0] = this.min[0];
-			// 				min[1] = this.min[1];
-			// 				min[2] = this.min[2];
-
-			// 				max[0] = this.min[0] + child_size;
-			// 				max[1] = this.min[1] + child_size;
-			// 				max[2] = this.min[2] + child_size;
-
-			// 				this.boxes.push(new Box(min.slice(), max.slice()));
-
-			// 				min[0] = this.min[0];
-			// 				min[1] = this.min[1];
-			// 				min[2] = this.min[2] + child_size;
-
-			// 				max[0] = this.min[0] + child_size;
-			// 				max[1] = this.min[1] + child_size;
-			// 				max[2] = this.max[2];
-
-			// 				this.boxes.push(new Box(min.slice(), max.slice()));
-
-			// 				min[0] = this.min[0];
-			// 				min[1] = this.min[1] + child_size;
-			// 				min[2] = this.min[2];
-
-			// 				max[0] = this.min[0] + child_size;
-			// 				max[1] = this.max[1];
-			// 				max[2] = this.min[2] + child_size;
-
-			// 				this.boxes.push(new Box(min.slice(), max.slice()));
-
-			// 				min[0] = this.min[0] + child_size;;
-			// 				min[1] = this.min[1];
-			// 				min[2] = this.min[2];
-
-			// 				max[0] = this.max[0]
-			// 				max[1] = this.min[1] + child_size;
-			// 				max[2] = this.min[2] + child_size;
-
-			// 				this.boxes.push(new Box(min.slice(), max.slice()));
-
-			// 				min[0] = this.min[0] + child_size;
-			// 				min[1] = this.min[1] + child_size;
-			// 				min[2] = this.min[2] + child_size;
-
-			// 				max[0] = this.max[0];
-			// 				max[1] = this.max[1];
-			// 				max[2] = this.max[2];
-
-			// 				this.boxes.push(new Box(min.slice(), max.slice()));
-
-			// 				min[0] = this.min[0] + child_size;
-			// 				min[1] = this.min[1] + child_size;
-			// 				min[2] = this.min[2];
-
-			// 				max[0] = this.max[0];
-			// 				max[1] = this.max[1];
-			// 				max[2] = this.min[2] + child_size;
-
-			// 				this.boxes.push(new Box(min.slice(), max.slice()));
-
-			// 				min[0] = this.min[0] + child_size;
-			// 				min[1] = this.min[1];
-			// 				min[2] = this.min[2] + child_size;
-
-			// 				max[0] = this.max[0];
-			// 				max[1] = this.min[1] + child_size;
-			// 				max[2] = this.max[2];
-
-			// 				this.boxes.push(new Box(min.slice(), max.slice()));
-
-			// 				min[0] = this.min[0];
-			// 				min[1] = this.min[1] + child_size;
-			// 				min[2] = this.min[2] + child_size;
-
-			// 				max[0] = this.min[0] + child_size;
-			// 				max[1] = this.max[1];
-			// 				max[2] = this.max[2];
-
-			// 				this.boxes.push(new Box(min.slice(), max.slice()));
-
-			// 				this.boxes.forEach((box) => box.split(level + 1));
-			// 			}
-
-			// 			pushTriangle (triangle_index, level)
-			// 			{
-			// 				let boxHasTriangle = false;
-
-			// 				const vertex1_index = _object.index_data[(triangle_index * 3) + 0];
-			// 				const vertex2_index = _object.index_data[(triangle_index * 3) + 1];
-			// 				const vertex3_index = _object.index_data[(triangle_index * 3) + 2];
-
-			// 				p1[0] = _object.position_data[(vertex1_index * 3) + 0];
-			// 				p1[1] = _object.position_data[(vertex1_index * 3) + 1];
-			// 				p1[2] = _object.position_data[(vertex1_index * 3) + 2];
-
-			// 				p2[0] = _object.position_data[(vertex2_index * 3) + 0];
-			// 				p2[1] = _object.position_data[(vertex2_index * 3) + 1];
-			// 				p2[2] = _object.position_data[(vertex2_index * 3) + 2];
-
-			// 				p3[0] = _object.position_data[(vertex3_index * 3) + 0];
-			// 				p3[1] = _object.position_data[(vertex3_index * 3) + 1];
-			// 				p3[2] = _object.position_data[(vertex3_index * 3) + 2];
-
-			// 				vsub(p1p2, p2, p1);
-			// 				vsub(p1p3, p3, p1);
-
-			// 				vsub(p2p1, p1, p2);
-			// 				vsub(p2p3, p3, p2);
-
-			// 				vsub(p3p1, p1, p3);
-			// 				vsub(p3p2, p2, p3);
-
-			// 				if
-			// 				(
-			// 					// point inside box
-			// 					this.testPointInsideBox(p1) ||
-			// 					this.testPointInsideBox(p2) ||
-			// 					this.testPointInsideBox(p3) ||
-
-			// 					// edge intersects box
-			// 					(testRayBoxIntersection(p1, p1p2, this.min, this.max) && testRayBoxIntersection(p2, p2p1, this.min, this.max)) ||
-			// 					(testRayBoxIntersection(p2, p2p3, this.min, this.max) && testRayBoxIntersection(p3, p3p2, this.min, this.max)) ||
-			// 					(testRayBoxIntersection(p3, p3p1, this.min, this.max) && testRayBoxIntersection(p1, p1p3, this.min, this.max))
-			// 				)
-			// 				{
-			// 					boxHasTriangle = true;
-
-			// 					// if (level === BoxTree.level_num - 1)
-			// 					// {
-			// 					// 	// LOG(this);
-			// 					// 	this.triangles.push(triangle_index);
-
-			// 					// 	return;
-			// 					// }
-
-			// 					this.triangles.push(triangle_index);
-			// 				}
-
-
-
-			// 				if (level === BoxTree.level_num - 1)
-			// 				{
-			// 					return;
-			// 				}
-
-
-
-			// 				if (boxHasTriangle)
-			// 				{
-			// 					this.boxes.forEach((box) => box.pushTriangle(triangle_index, level + 1));
-			// 				}
-			// 			}
-
-			// 			serialize (offset)
-			// 			{
-			// 				let size = 0;
-
-			// 				_object.data_f32[offset + size + 0] = this.min[0];
-			// 				_object.data_f32[offset + size + 1] = this.min[1];
-			// 				_object.data_f32[offset + size + 2] = this.min[2];
-
-			// 				size += 4;
-
-			// 				_object.data_f32[offset + size + 0] = this.max[0];
-			// 				_object.data_f32[offset + size + 1] = this.max[1];
-			// 				_object.data_f32[offset + size + 2] = this.max[2];
-
-			// 				size += 4;
-
-			// 				const boxes_with_triangle_count =
-			// 					this.boxes.filter((box) => (box.triangles.length !== 0)).length;
-
-			// 				_object.data_ui32[offset + size] = boxes_with_triangle_count;
-
-			// 				++size;
-
-			// 				if (boxes_with_triangle_count)
-			// 				{
-			// 					const _size = size;
-
-			// 					const boxes_count = this.boxes.length;
-
-			// 					for (let i = 0, _i = 0; i < boxes_count; ++i)
-			// 					{
-			// 						const box = this.boxes[i];
-
-			// 						if (box.triangles.length !== 0)
-			// 						{
-			// 							const box_offset = offset + size + boxes_with_triangle_count;
-
-			// 							_object.data_ui32[offset + _size + _i] = box_offset;
-
-			// 							size += box.serialize(box_offset);
-
-			// 							++_i;
-			// 						}
-			// 					}
-
-			// 					size += boxes_with_triangle_count;
-			// 				}
-			// 				else if (this.triangles.length !== 0)
-			// 				{
-			// 					_object.data_ui32[offset + size] = this.triangles.length;
-
-			// 					++size;
-
-			// 					for (let i = 0, i_max = this.triangles.length; i < i_max; ++i)
-			// 					{
-			// 						// _object.data_ui32[offset + size] = this.triangles[i];
-			// 						_object.data_ui32[offset + size] = this.triangles[i] * 3;
-
-			// 						++size;
-			// 					}
-			// 				}
-
-			// 				return size;
-			// 			}
-			// 		}
-
-			// 		this.Box = Box;
-			// 	}
-
-			// 	makeBoundingBox ()
-			// 	{
-			// 		const min = new Float32Array(3);
-			// 		min[0] = Infinity;
-			// 		min[1] = Infinity;
-			// 		min[2] = Infinity;
-
-			// 		const max = new Float32Array(3);
-			// 		max[0] = -Infinity;
-			// 		max[1] = -Infinity;
-			// 		max[2] = -Infinity;
-
-			// 		for (let i = 0; i < this.position_data.length; i += 3)
-			// 		{
-			// 			if (this.position_data[i + 0] < min[0])
-			// 			{
-			// 				min[0] = this.position_data[i + 0];
-			// 			}
-
-			// 			if (this.position_data[i + 0] > max[0])
-			// 			{
-			// 				max[0] = this.position_data[i + 0];
-			// 			}
-
-			// 			if (this.position_data[i + 1] < min[1])
-			// 			{
-			// 				min[1] = this.position_data[i + 1];
-			// 			}
-
-			// 			if (this.position_data[i + 1] > max[1])
-			// 			{
-			// 				max[1] = this.position_data[i + 1];
-			// 			}
-
-			// 			if (this.position_data[i + 2] < min[2])
-			// 			{
-			// 				min[2] = this.position_data[i + 2];
-			// 			}
-
-			// 			if (this.position_data[i + 2] > max[2])
-			// 			{
-			// 				max[2] = this.position_data[i + 2];
-			// 			}
-			// 		}
-
-			// 		this.bounding_box = new this.Box(min, max);
-
-			// 		this.bounding_box.split(0);
-			// 	}
-
-			// 	makeTree ()
-			// 	{
-			// 		for (let i = 0, i_max = this.index_data.length / 3; i < i_max; ++i)
-			// 		{
-			// 			this.bounding_box.pushTriangle(i, 0);
-			// 		}
-			// 	}
-
-			// 	serialize ()
-			// 	{
-			// 		this.bounding_box.serialize(0, 0);
-			// 	}
-			// }
-
-
-
-			// // const sphere = new THREE.SphereGeometry(10, 256, 256);
-			// // LOG(sphere)
-			// const sphere = new THREE.SphereGeometry(10, 64, 64);
-
-			// const sphere_object = new BoxTree(sphere.attributes.position.array, sphere.index.array);
-			// sphere_object.makeBoundingBox();
-			// sphere_object.makeTree();
-			// sphere_object.serialize();
-
-			// LOG(sphere_object)
-
-
-
 			const dimension_segment_count = 16;
 
 			const testRayBoxIntersection = (ray_origin, ray_direction, box_min, box_max) =>
@@ -714,7 +251,7 @@ window.addEventListener
 					this.min = null;
 					this.max = null;
 
-					this._data = new ArrayBuffer(1048 * 1024 * 4);
+					this._data = new ArrayBuffer(1024 * 1024 * 4);
 					this.data_ui32 = new Uint32Array(this._data);
 					this.data_f32 = new Float32Array(this._data);
 
@@ -887,6 +424,10 @@ window.addEventListener
 
 			object_base.updateVertexData(_pos);
 			object_base.updateIndexData(_ind);
+
+
+
+			LOG(_pos.length, _pos.join(',\n'))
 		}
 		/* eslint-enable */
 		/*
@@ -917,6 +458,8 @@ window.addEventListener
 
 		await renderer.init();
 
+		renderer.appendFpsCounter();
+
 
 
 		const
@@ -924,7 +467,7 @@ window.addEventListener
 				Scene,
 				Material,
 				UniformBlock,
-				StorageBlock2,
+				StorageBlock3,
 				// DescriptorSet,
 				Object,
 			} = renderer;
@@ -937,70 +480,18 @@ window.addEventListener
 			UniformBlock.getInstance
 			(wasm_wrapper.Addr(wasm_wrapper.exports.surface_uniform_block_camera.value));
 
-		const tree_buffer =
-			renderer.device.createBuffer
-			({
-				size: tree_data.byteLength,
-
-				usage:
-				(
-					window.GPUBufferUsage.COPY_DST |
-					window.GPUBufferUsage.STORAGE
-				),
-			});
-
-		renderer.gpu_resources.push(tree_buffer);
-
-		renderer.device.queue.writeBuffer
-		(
-			tree_buffer,
-			0,
-			tree_data,
-			0,
-			tree_data.length,
-		);
-
-		LOG(tree_data.byteLength)
-
 		const tree_storage_block =
-			new StorageBlock2
+			new StorageBlock3
 			(
-				tree_buffer,
+				tree_data,
 				3,
 				tree_data.byteLength,
 			);
 
-
-
-		const tri_buffer =
-			renderer.device.createBuffer
-			({
-				size: tri_data.byteLength,
-
-				usage:
-				(
-					window.GPUBufferUsage.COPY_DST |
-					window.GPUBufferUsage.STORAGE
-				),
-			});
-
-		renderer.gpu_resources.push(tri_buffer);
-
-		renderer.device.queue.writeBuffer
-		(
-			tri_buffer,
-			0,
-			tri_data,
-			0,
-			tri_data.length,
-		);
-
-		LOG(tri_data.byteLength)
-
 		const tri_storage_block =
-			new StorageBlock2
+			new StorageBlock3
 			(
-				tri_buffer,
+				tri_data,
 				1,
 				tri_data.byteLength,
 			);
@@ -1014,19 +505,11 @@ window.addEventListener
 			Material.getInstance
 			(surface_material_addr, Material.ShaderUsage.GLSL_VULKAN, [ scene.descriptor_set ]);
 
-		LOG(surface_material)
-
 		const surface_object = Object.getInstance(surface_object_addr);
 
 		surface_object.createBuffers();
 
 
-
-		let time = Date.now();
-
-		const [ ,, fps ] = document.querySelectorAll('.fps');
-
-		let fps_counter = 0;
 
 		renderer.loop_function = () =>
 		{
@@ -1065,18 +548,7 @@ window.addEventListener
 
 			renderer.device.queue.submit([ command_buffer ]);
 
-
-
-			if (Math.floor((Date.now() - time) * 0.001))
-			{
-				fps.innerHTML = fps_counter;
-
-				fps_counter = 0;
-
-				time = Date.now();
-			}
-
-			++fps_counter;
+			renderer.updateFpsCounter();
 		};
 
 		renderer.canvas.parentNode.style.display = 'block';
