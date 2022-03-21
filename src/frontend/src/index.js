@@ -72,7 +72,6 @@ window.addEventListener
 					RDTY_MATH_Orbit_rotate2(orbit, evt.movementX * 0.01, evt.movementY * 0.01);
 					RDTY_MATH_Orbit_update(orbit);
 
-
 					wasm_wrapper.exports.startTransition();
 				},
 			);
@@ -84,9 +83,90 @@ window.addEventListener
 
 
 
+		const sphere = new THREE.SphereGeometry(10, 64, 64);
+		// const sphere = new THREE.TorusKnotGeometry(10, 3, 320, 32);
+		// const sphere = new THREE.TorusKnotGeometry(5, 1.5, 80, 16);
+		// const sphere = new THREE.BoxGeometry(20, 20, 20, 32, 32, 32);
+		LOG(sphere)
+
 		/* eslint-disable */
 		let tree_data = null;
 		let tri_data = null;
+
+		{
+			const object_base = rdty_renderers.ObjectBase.getInstance(object_addr);
+
+			const _pos = new Float32Array(sphere.attributes.position.array.length / 3 * 4);
+
+			for (let i = 0; i < sphere.attributes.position.array.length / 3; ++i)
+			{
+				_pos[(i * 4) + 0] = sphere.attributes.position.array[(i * 3) + 0];
+				_pos[(i * 4) + 1] = sphere.attributes.position.array[(i * 3) + 1];
+				_pos[(i * 4) + 2] = sphere.attributes.position.array[(i * 3) + 2];
+			}
+
+			const _ind = new Uint32Array(sphere.index.array.length / 3 * 4);
+
+			for (let i = 0; i < sphere.index.array.length / 3; ++i)
+			{
+				_ind[(i * 4) + 0] = sphere.index.array[(i * 3) + 0];
+				_ind[(i * 4) + 1] = sphere.index.array[(i * 3) + 1];
+				_ind[(i * 4) + 2] = sphere.index.array[(i * 3) + 2];
+			}
+
+			object_base.updateStdVectorData('position_data', _pos);
+			object_base.updateStdVectorData('index_data', _ind);
+
+			LOG(object_base)
+		}
+		/* eslint-enable */
+		/*
+		eslint-disable
+
+		max-statements,
+		no-lone-blocks,
+		no-magic-numbers,
+		*/
+
+
+
+		wasm_wrapper.exports.constructRenderityWrappers2();
+
+
+
+		const webgpu = new rdty_renderers.WebGPU(wasm_wrapper);
+
+		const renderer =
+			new webgpu.Renderer
+			(
+				renderer_addr,
+
+				{
+					canvas: document.querySelector('#webgpu'),
+				},
+			);
+
+		await renderer.init();
+
+		renderer.appendFpsCounter();
+
+
+
+		const
+			{
+				Scene,
+				Material,
+				UniformBlock,
+				StorageBlock3,
+				// DescriptorSet,
+				Object,
+			} = renderer;
+
+
+
+		const scene = Scene.getInstance(scene_addr);
+
+
 
 		{
 			const dimension_segment_count = 16;
@@ -237,7 +317,7 @@ window.addEventListener
 				}
 
 				return false;
-			}
+			};
 
 
 
@@ -248,8 +328,8 @@ window.addEventListener
 					this.position_data = position_data;
 					this.index_data = index_data;
 
-					this.min = null;
-					this.max = null;
+					this.min = new Float32Array(3).fill(Infinity);
+					this.max = new Float32Array(3).fill(-Infinity);
 
 					this._data = new ArrayBuffer(1024 * 1024 * 4);
 					this.data_ui32 = new Uint32Array(this._data);
@@ -259,242 +339,162 @@ window.addEventListener
 					this.triangle_count = 0;
 				}
 
-				makeBoundingBox ()
-				{
-					const min = new Float32Array(3);
-					min[0] = Infinity;
-					min[1] = Infinity;
-					min[2] = Infinity;
+				// makeBoundingBox ()
+				// {
+				// 	for (let i = 0; i < this.position_data.length; i += 3)
+				// 	{
+				// 		if (this.position_data[i + 0] < this.min[0])
+				// 		{
+				// 			this.min[0] = this.position_data[i + 0];
+				// 		}
 
-					const max = new Float32Array(3);
-					max[0] = -Infinity;
-					max[1] = -Infinity;
-					max[2] = -Infinity;
+				// 		if (this.position_data[i + 0] > this.max[0])
+				// 		{
+				// 			this.max[0] = this.position_data[i + 0];
+				// 		}
 
-					for (let i = 0; i < this.position_data.length; i += 3)
-					{
-						if (this.position_data[i + 0] < min[0])
-						{
-							min[0] = this.position_data[i + 0];
-						}
+				// 		if (this.position_data[i + 1] < this.min[1])
+				// 		{
+				// 			this.min[1] = this.position_data[i + 1];
+				// 		}
 
-						if (this.position_data[i + 0] > max[0])
-						{
-							max[0] = this.position_data[i + 0];
-						}
+				// 		if (this.position_data[i + 1] > this.max[1])
+				// 		{
+				// 			this.max[1] = this.position_data[i + 1];
+				// 		}
 
-						if (this.position_data[i + 1] < min[1])
-						{
-							min[1] = this.position_data[i + 1];
-						}
+				// 		if (this.position_data[i + 2] < this.min[2])
+				// 		{
+				// 			this.min[2] = this.position_data[i + 2];
+				// 		}
 
-						if (this.position_data[i + 1] > max[1])
-						{
-							max[1] = this.position_data[i + 1];
-						}
+				// 		if (this.position_data[i + 2] > this.max[2])
+				// 		{
+				// 			this.max[2] = this.position_data[i + 2];
+				// 		}
+				// 	}
 
-						if (this.position_data[i + 2] < min[2])
-						{
-							min[2] = this.position_data[i + 2];
-						}
+				// 	const center =
+				// 		new Float32Array
+				// 		([
+				// 			(this.min[0] + this.max[0]) * 0.5,
+				// 			(this.min[1] + this.max[1]) * 0.5,
+				// 			(this.min[2] + this.max[2]) * 0.5,
+				// 		]);
 
-						if (this.position_data[i + 2] > max[2])
-						{
-							max[2] = this.position_data[i + 2];
-						}
-					}
+				// 	const _min = Math.max(Math.max(Math.abs(this.min[0] - center[0]), Math.abs(this.min[1] - center[1])), Math.abs(this.min[2] - center[2]));
+				// 	const _max = Math.max(Math.max(Math.abs(this.max[0] - center[0]), Math.abs(this.max[1] - center[1])), Math.abs(this.max[2] - center[2]));
+				// 	const __max = Math.max(_min, _max);
 
-					const _min = Math.max(Math.max(Math.abs(min[0]), Math.abs(min[1])), Math.abs(min[2]));
-					const _max = Math.max(Math.max(Math.abs(max[0]), Math.abs(max[1])), Math.abs(max[2]));
-					const __max = Math.max(_min, _max);
+				// 	this.min[0] = center[0] - __max;
+				// 	this.min[1] = center[1] - __max;
+				// 	this.min[2] = center[2] - __max;
 
-					min.fill(-__max);
-					max.fill(__max);
-
-					this.min = min;
-					this.max = max;
-				}
+				// 	this.max[0] = center[0] + __max;
+				// 	this.max[1] = center[1] + __max;
+				// 	this.max[2] = center[2] + __max;
+				// }
 
 				test ()
 				{
-					const min = new Float32Array(3);
-					const max = new Float32Array(3);
-
-					const step = (this.max[0] - this.min[0]) / dimension_segment_count;
-
-					let box_index = 0;
-
-					this.data_f32[box_index + 0] = this.min[0];
-					this.data_f32[box_index + 1] = this.min[1];
-					this.data_f32[box_index + 2] = this.min[2];
-
-					this.data_ui32[box_index + 3] = dimension_segment_count;
-
-					this.data_f32[box_index + 4] = this.max[0];
-					this.data_f32[box_index + 5] = this.max[1];
-					this.data_f32[box_index + 6] = this.max[2];
-
-					for (let x = 0; x < dimension_segment_count; ++x)
-					{
-						for (let y = 0; y < dimension_segment_count; ++y)
+					scene.original_struct.objects.forEach
+					(
+						(elm) =>
 						{
-							for (let z = 0; z < dimension_segment_count; ++z)
+							const ob = Object.getInstance(elm);
+							LOG(ob)
+
+							const _min = ob.original_struct.bounding_box_min;
+							const _max = ob.original_struct.bounding_box_max;
+
+							const min = new Float32Array(3);
+							const max = new Float32Array(3);
+
+							const step = (_max[0] - _min[0]) / dimension_segment_count;
+
+							let box_index = 0;
+
+							this.data_f32[box_index + 0] = _min[0];
+							this.data_f32[box_index + 1] = _min[1];
+							this.data_f32[box_index + 2] = _min[2];
+
+							this.data_ui32[box_index + 3] = dimension_segment_count;
+
+							this.data_f32[box_index + 4] = _max[0];
+							this.data_f32[box_index + 5] = _max[1];
+							this.data_f32[box_index + 6] = _max[2];
+
+							for (let x = 0; x < dimension_segment_count; ++x)
 							{
-								box_index = (x * dimension_segment_count * dimension_segment_count + y * dimension_segment_count + z + 1) * 8;
-
-								min[0] = this.min[0] + (step * x);
-								min[1] = this.min[1] + (step * y);
-								min[2] = this.min[2] + (step * z);
-
-								max[0] = min[0] + step;
-								max[1] = min[1] + step;
-								max[2] = min[2] + step;
-
-
-
-								const triangle_start = this.triangle_count;
-
-								for (let i = 0, i_max = this.index_data.length; i < i_max; i += 3)
+								for (let y = 0; y < dimension_segment_count; ++y)
 								{
-									if (testTriangle(i, min, max, this))
+									for (let z = 0; z < dimension_segment_count; ++z)
 									{
-										this.triangles_data[this.triangle_count++] = i / 3;
+										box_index = (x * dimension_segment_count * dimension_segment_count + y * dimension_segment_count + z + 1) * 8;
+
+										min[0] = _min[0] + (step * x);
+										min[1] = _min[1] + (step * y);
+										min[2] = _min[2] + (step * z);
+
+										max[0] = min[0] + step;
+										max[1] = min[1] + step;
+										max[2] = min[2] + step;
+
+
+
+										const triangle_start = this.triangle_count;
+
+										for (let i = 0, i_max = this.index_data.length; i < i_max; i += 3)
+										{
+											if (testTriangle(i, min, max, this))
+											{
+												this.triangles_data[this.triangle_count++] = i / 3;
+											}
+										}
+
+										const triangle_end = this.triangle_count;
+
+
+
+										this.data_f32[box_index + 0] = min[0];
+										this.data_f32[box_index + 1] = min[1];
+										this.data_f32[box_index + 2] = min[2];
+
+										this.data_ui32[box_index + 3] = triangle_start;
+
+										this.data_f32[box_index + 4] = max[0];
+										this.data_f32[box_index + 5] = max[1];
+										this.data_f32[box_index + 6] = max[2];
+
+										this.data_ui32[box_index + 7] = triangle_end;
 									}
 								}
-
-								const triangle_end = this.triangle_count;
-
-
-
-								this.data_f32[box_index + 0] = min[0];
-								this.data_f32[box_index + 1] = min[1];
-								this.data_f32[box_index + 2] = min[2];
-
-								this.data_ui32[box_index + 3] = triangle_start;
-
-								this.data_f32[box_index + 4] = max[0];
-								this.data_f32[box_index + 5] = max[1];
-								this.data_f32[box_index + 6] = max[2];
-
-								this.data_ui32[box_index + 7] = triangle_end;
 							}
-						}
-					}
+						},
+					);
 				}
 			}
 
 
 
-			const sphere = new THREE.SphereGeometry(10, 64, 64);
-			// const sphere = new THREE.TorusKnotGeometry(10, 3, 320, 32);
-			// const sphere = new THREE.TorusKnotGeometry(5, 1.5, 80, 16);
-			// const sphere = new THREE.BoxGeometry(20, 20, 20, 32, 32, 32);
-			LOG(sphere)
-
 			const sphere_object = new BoxTree(sphere.attributes.position.array, sphere.index.array);
 
-			sphere_object.makeBoundingBox();
-			LOG(sphere_object)
+			// sphere_object.makeBoundingBox();
+			// LOG(sphere_object)
 			sphere_object.test();
 
 			tree_data = sphere_object.data_ui32;
 			tri_data = sphere_object.triangles_data;
-
-
-
-			const object_base = rdty_renderers.ObjectBase.getInstance(object_addr);
-
-			const _pos = new Float32Array(sphere.attributes.position.array.length / 3 * 4);
-
-			for (let i = 0; i < sphere.attributes.position.array.length / 3; ++i)
-			{
-				_pos[(i * 4) + 0] = sphere.attributes.position.array[(i * 3) + 0];
-				_pos[(i * 4) + 1] = sphere.attributes.position.array[(i * 3) + 1];
-				_pos[(i * 4) + 2] = sphere.attributes.position.array[(i * 3) + 2];
-			}
-
-			const _ind = new Uint32Array(sphere.index.array.length / 3 * 4);
-
-			for (let i = 0; i < sphere.index.array.length / 3; ++i)
-			{
-				_ind[(i * 4) + 0] = sphere.index.array[(i * 3) + 0];
-				_ind[(i * 4) + 1] = sphere.index.array[(i * 3) + 1];
-				_ind[(i * 4) + 2] = sphere.index.array[(i * 3) + 2];
-			}
-
-			object_base.updateVertexData(_pos);
-			object_base.updateIndexData(_ind);
-
-
-
-			LOG(_pos.length, _pos.join(',\n'))
 		}
-		/* eslint-enable */
-		/*
-		eslint-disable
-
-		max-statements,
-		no-lone-blocks,
-		no-magic-numbers,
-		*/
 
 
-
-		wasm_wrapper.exports.constructRenderityWrappers2();
-
-
-
-		const webgpu = new rdty_renderers.WebGPU(wasm_wrapper);
-
-		const renderer =
-			new webgpu.Renderer
-			(
-				renderer_addr,
-
-				{
-					canvas: document.querySelector('#webgpu'),
-				},
-			);
-
-		await renderer.init();
-
-		renderer.appendFpsCounter();
-
-
-
-		const
-			{
-				Scene,
-				Material,
-				UniformBlock,
-				StorageBlock3,
-				// DescriptorSet,
-				Object,
-			} = renderer;
-
-
-
-		const scene = Scene.getInstance(scene_addr);
 
 		const surface_uniform_block_camera =
 			UniformBlock.getInstance
 			(wasm_wrapper.Addr(wasm_wrapper.exports.surface_uniform_block_camera.value));
 
-		const tree_storage_block =
-			new StorageBlock3
-			(
-				tree_data,
-				3,
-				tree_data.byteLength,
-			);
-
-		const tri_storage_block =
-			new StorageBlock3
-			(
-				tri_data,
-				1,
-				tri_data.byteLength,
-			);
+		const tree_storage_block = new StorageBlock3(tree_data, 3);
+		const tri_storage_block = new StorageBlock3(tri_data, 1);
 
 
 
