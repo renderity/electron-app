@@ -114,8 +114,8 @@ window.addEventListener
 				_ind[(i * 4) + 2] = sphere.index.array[(i * 3) + 2];
 			}
 
-			object_base.updateStdVectorData('position_data', _pos);
-			object_base.updateStdVectorData('index_data', _ind);
+			object_base.updateStdVectorData('position_data', 'Float', _pos);
+			object_base.updateStdVectorData('index_data', 'Uint32', _ind);
 
 			LOG(object_base)
 		}
@@ -279,17 +279,17 @@ window.addEventListener
 				const vertex2_index = _object.index_data[(triangle_index) + 1];
 				const vertex3_index = _object.index_data[(triangle_index) + 2];
 
-				p1[0] = _object.position_data[(vertex1_index * 3) + 0];
-				p1[1] = _object.position_data[(vertex1_index * 3) + 1];
-				p1[2] = _object.position_data[(vertex1_index * 3) + 2];
+				p1[0] = _object.position_data[(vertex1_index * 4) + 0];
+				p1[1] = _object.position_data[(vertex1_index * 4) + 1];
+				p1[2] = _object.position_data[(vertex1_index * 4) + 2];
 
-				p2[0] = _object.position_data[(vertex2_index * 3) + 0];
-				p2[1] = _object.position_data[(vertex2_index * 3) + 1];
-				p2[2] = _object.position_data[(vertex2_index * 3) + 2];
+				p2[0] = _object.position_data[(vertex2_index * 4) + 0];
+				p2[1] = _object.position_data[(vertex2_index * 4) + 1];
+				p2[2] = _object.position_data[(vertex2_index * 4) + 2];
 
-				p3[0] = _object.position_data[(vertex3_index * 3) + 0];
-				p3[1] = _object.position_data[(vertex3_index * 3) + 1];
-				p3[2] = _object.position_data[(vertex3_index * 3) + 2];
+				p3[0] = _object.position_data[(vertex3_index * 4) + 0];
+				p3[1] = _object.position_data[(vertex3_index * 4) + 1];
+				p3[2] = _object.position_data[(vertex3_index * 4) + 2];
 
 				vsub(p1p2, p2, p1);
 				vsub(p1p3, p3, p1);
@@ -323,14 +323,8 @@ window.addEventListener
 
 			class BoxTree
 			{
-				constructor (position_data, index_data)
+				constructor ()
 				{
-					this.position_data = position_data;
-					this.index_data = index_data;
-
-					this.min = new Float32Array(3).fill(Infinity);
-					this.max = new Float32Array(3).fill(-Infinity);
-
 					this._data = new ArrayBuffer(1024 * 1024 * 4);
 					this.data_ui32 = new Uint32Array(this._data);
 					this.data_f32 = new Float32Array(this._data);
@@ -339,62 +333,6 @@ window.addEventListener
 					this.triangle_count = 0;
 				}
 
-				// makeBoundingBox ()
-				// {
-				// 	for (let i = 0; i < this.position_data.length; i += 3)
-				// 	{
-				// 		if (this.position_data[i + 0] < this.min[0])
-				// 		{
-				// 			this.min[0] = this.position_data[i + 0];
-				// 		}
-
-				// 		if (this.position_data[i + 0] > this.max[0])
-				// 		{
-				// 			this.max[0] = this.position_data[i + 0];
-				// 		}
-
-				// 		if (this.position_data[i + 1] < this.min[1])
-				// 		{
-				// 			this.min[1] = this.position_data[i + 1];
-				// 		}
-
-				// 		if (this.position_data[i + 1] > this.max[1])
-				// 		{
-				// 			this.max[1] = this.position_data[i + 1];
-				// 		}
-
-				// 		if (this.position_data[i + 2] < this.min[2])
-				// 		{
-				// 			this.min[2] = this.position_data[i + 2];
-				// 		}
-
-				// 		if (this.position_data[i + 2] > this.max[2])
-				// 		{
-				// 			this.max[2] = this.position_data[i + 2];
-				// 		}
-				// 	}
-
-				// 	const center =
-				// 		new Float32Array
-				// 		([
-				// 			(this.min[0] + this.max[0]) * 0.5,
-				// 			(this.min[1] + this.max[1]) * 0.5,
-				// 			(this.min[2] + this.max[2]) * 0.5,
-				// 		]);
-
-				// 	const _min = Math.max(Math.max(Math.abs(this.min[0] - center[0]), Math.abs(this.min[1] - center[1])), Math.abs(this.min[2] - center[2]));
-				// 	const _max = Math.max(Math.max(Math.abs(this.max[0] - center[0]), Math.abs(this.max[1] - center[1])), Math.abs(this.max[2] - center[2]));
-				// 	const __max = Math.max(_min, _max);
-
-				// 	this.min[0] = center[0] - __max;
-				// 	this.min[1] = center[1] - __max;
-				// 	this.min[2] = center[2] - __max;
-
-				// 	this.max[0] = center[0] + __max;
-				// 	this.max[1] = center[1] + __max;
-				// 	this.max[2] = center[2] + __max;
-				// }
-
 				test ()
 				{
 					scene.original_struct.objects.forEach
@@ -402,7 +340,6 @@ window.addEventListener
 						(elm) =>
 						{
 							const ob = Object.getInstance(elm);
-							LOG(ob)
 
 							const _min = ob.original_struct.bounding_box_min;
 							const _max = ob.original_struct.bounding_box_max;
@@ -444,11 +381,11 @@ window.addEventListener
 
 										const triangle_start = this.triangle_count;
 
-										for (let i = 0, i_max = this.index_data.length; i < i_max; i += 3)
+										for (let i = 0, i_max = ob.original_struct.index_data.length; i < i_max; i += 4)
 										{
-											if (testTriangle(i, min, max, this))
+											if (testTriangle(i, min, max, ob.original_struct))
 											{
-												this.triangles_data[this.triangle_count++] = i / 3;
+												this.triangles_data[this.triangle_count++] = i / 4;
 											}
 										}
 
@@ -477,10 +414,8 @@ window.addEventListener
 
 
 
-			const sphere_object = new BoxTree(sphere.attributes.position.array, sphere.index.array);
+			const sphere_object = new BoxTree();
 
-			// sphere_object.makeBoundingBox();
-			// LOG(sphere_object)
 			sphere_object.test();
 
 			tree_data = sphere_object.data_ui32;
