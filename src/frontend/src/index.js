@@ -52,6 +52,7 @@ window.addEventListener
 		const renderer_addr = wasm_wrapper.Addr(wasm_wrapper.exports.renderer.value);
 		const scene_addr = wasm_wrapper.Addr(wasm_wrapper.exports.scene.value);
 		const object_addr = wasm_wrapper.Addr(wasm_wrapper.exports._object.value);
+		const object2_addr = wasm_wrapper.Addr(wasm_wrapper.exports.object2.value);
 		const surface_material_addr = wasm_wrapper.Addr(wasm_wrapper.exports.surface_material.value);
 		const surface_object_addr = wasm_wrapper.Addr(wasm_wrapper.exports.surface_object.value);
 
@@ -83,35 +84,34 @@ window.addEventListener
 
 
 
-		const sphere = new THREE.SphereGeometry(10, 64, 64);
-		// const sphere = new THREE.TorusKnotGeometry(10, 3, 320, 32);
-		// const sphere = new THREE.TorusKnotGeometry(5, 1.5, 80, 16);
-		// const sphere = new THREE.BoxGeometry(20, 20, 20, 32, 32, 32);
-		LOG(sphere)
-
-		/* eslint-disable */
-		let tree_data = null;
-		let tri_data = null;
+		// const three_geometry = new THREE.SphereGeometry(10, 64, 64);
+		// const three_geometry = new THREE.TorusKnotGeometry(10, 3, 320, 32);
+		// const three_geometry = new THREE.TorusKnotGeometry(5, 1.5, 80, 16);
+		// const three_geometry = new THREE.BoxGeometry(20, 20, 20, 32, 32, 32);
 
 		{
+			const three_geometry = new THREE.SphereGeometry(10, 32, 32);
+
+			three_geometry.translate(5, 0, 0);
+
 			const object_base = rdty_renderers.ObjectBase.getInstance(object_addr);
 
-			const _pos = new Float32Array(sphere.attributes.position.array.length / 3 * 4);
+			const _pos = new Float32Array(three_geometry.attributes.position.array.length / 3 * 4);
 
-			for (let i = 0; i < sphere.attributes.position.array.length / 3; ++i)
+			for (let i = 0; i < three_geometry.attributes.position.array.length / 3; ++i)
 			{
-				_pos[(i * 4) + 0] = sphere.attributes.position.array[(i * 3) + 0];
-				_pos[(i * 4) + 1] = sphere.attributes.position.array[(i * 3) + 1];
-				_pos[(i * 4) + 2] = sphere.attributes.position.array[(i * 3) + 2];
+				_pos[(i * 4) + 0] = three_geometry.attributes.position.array[(i * 3) + 0];
+				_pos[(i * 4) + 1] = three_geometry.attributes.position.array[(i * 3) + 1];
+				_pos[(i * 4) + 2] = three_geometry.attributes.position.array[(i * 3) + 2];
 			}
 
-			const _ind = new Uint32Array(sphere.index.array.length / 3 * 4);
+			const _ind = new Uint32Array(three_geometry.index.array.length / 3 * 4);
 
-			for (let i = 0; i < sphere.index.array.length / 3; ++i)
+			for (let i = 0; i < three_geometry.index.array.length / 3; ++i)
 			{
-				_ind[(i * 4) + 0] = sphere.index.array[(i * 3) + 0];
-				_ind[(i * 4) + 1] = sphere.index.array[(i * 3) + 1];
-				_ind[(i * 4) + 2] = sphere.index.array[(i * 3) + 2];
+				_ind[(i * 4) + 0] = three_geometry.index.array[(i * 3) + 0];
+				_ind[(i * 4) + 1] = three_geometry.index.array[(i * 3) + 1];
+				_ind[(i * 4) + 2] = three_geometry.index.array[(i * 3) + 2];
 			}
 
 			object_base.updateStdVectorData('position_data', 'Float', _pos);
@@ -119,14 +119,37 @@ window.addEventListener
 
 			LOG(object_base)
 		}
-		/* eslint-enable */
-		/*
-		eslint-disable
 
-		max-statements,
-		no-lone-blocks,
-		no-magic-numbers,
-		*/
+		{
+			const three_geometry = new THREE.SphereGeometry(10, 32, 32);
+
+			three_geometry.translate(-5, 0, 0);
+
+			const object_base = rdty_renderers.ObjectBase.getInstance(object2_addr);
+
+			const _pos = new Float32Array(three_geometry.attributes.position.array.length / 3 * 4);
+
+			for (let i = 0; i < three_geometry.attributes.position.array.length / 3; ++i)
+			{
+				_pos[(i * 4) + 0] = three_geometry.attributes.position.array[(i * 3) + 0];
+				_pos[(i * 4) + 1] = three_geometry.attributes.position.array[(i * 3) + 1];
+				_pos[(i * 4) + 2] = three_geometry.attributes.position.array[(i * 3) + 2];
+			}
+
+			const _ind = new Uint32Array(three_geometry.index.array.length / 3 * 4);
+
+			for (let i = 0; i < three_geometry.index.array.length / 3; ++i)
+			{
+				_ind[(i * 4) + 0] = three_geometry.index.array[(i * 3) + 0];
+				_ind[(i * 4) + 1] = three_geometry.index.array[(i * 3) + 1];
+				_ind[(i * 4) + 2] = three_geometry.index.array[(i * 3) + 2];
+			}
+
+			object_base.updateStdVectorData('position_data', 'Float', _pos);
+			object_base.updateStdVectorData('index_data', 'Uint32', _ind);
+
+			LOG(object_base)
+		}
 
 
 
@@ -168,268 +191,12 @@ window.addEventListener
 
 
 
-		{
-			const dimension_segment_count = 16;
-
-			const testRayBoxIntersection = (ray_origin, ray_direction, box_min, box_max) =>
-			{
-				let tmin = (box_min[0] - ray_origin[0]) / ray_direction[0];
-				let tmax = (box_max[0] - ray_origin[0]) / ray_direction[0];
-
-				if (tmin > tmax)
-				{
-					const _tmp = tmin;
-					tmin = tmax;
-					tmax = _tmp;
-				}
-
-				let tymin = (box_min[1] - ray_origin[1]) / ray_direction[1];
-				let tymax = (box_max[1] - ray_origin[1]) / ray_direction[1];
-
-				if (tymin > tymax)
-				{
-					const _tmp = tymin;
-					tymin = tymax;
-					tymax = _tmp;
-				}
-
-				if ((tmin > tymax) || (tymin > tmax))
-				{
-					return false;
-				}
-
-				if (tymin > tmin)
-				{
-					tmin = tymin;
-				}
-
-				if (tymax < tmax)
-				{
-					tmax = tymax;
-				}
-
-				let tzmin = (box_min[2] - ray_origin[2]) / ray_direction[2];
-				let tzmax = (box_max[2] - ray_origin[2]) / ray_direction[2];
-
-				if (tzmin > tzmax)
-				{
-					const _tmp = tzmin;
-					tzmin = tzmax;
-					tzmax = _tmp;
-				}
-
-				if ((tmin > tzmax) || (tzmin > tmax))
-				{
-					return false;
-				}
-
-				if (tzmin > tmin)
-				{
-					tmin = tzmin;
-				}
-
-				if (tzmax < tmax)
-				{
-					tmax = tzmax;
-				}
-
-				if (tmin > tmax)
-				{
-					return false;
-				}
-
-				return (tmin > 0 && tmax > 0);
-				// return true;
-			};
-
-			const vsub = (target, a, b) =>
-			{
-				target[0] = a[0] - b[0];
-				target[1] = a[1] - b[1];
-				target[2] = a[2] - b[2];
-			};
-
-
-
-			const p1 = [ 0, 0, 0 ];
-			const p2 = [ 0, 0, 0 ];
-			const p3 = [ 0, 0, 0 ];
-			const p1p2 = [ 0, 0, 0 ];
-			const p1p3 = [ 0, 0, 0 ];
-			const p2p1 = [ 0, 0, 0 ];
-			const p2p3 = [ 0, 0, 0 ];
-			const p3p1 = [ 0, 0, 0 ];
-			const p3p2 = [ 0, 0, 0 ];
-
-
-
-			const testPointInsideBox = (point, min, max) =>
-			{
-				return Boolean
-				(
-					point[0] <= max[0] && point[0] >= min[0] &&
-					point[1] <= max[1] && point[1] >= min[1] &&
-					point[2] <= max[2] && point[2] >= min[2],
-				);
-			}
-
-			const testTriangle = (triangle_index, min, max, _object) =>
-			{
-				const vertex1_index = _object.index_data[(triangle_index) + 0];
-				const vertex2_index = _object.index_data[(triangle_index) + 1];
-				const vertex3_index = _object.index_data[(triangle_index) + 2];
-
-				p1[0] = _object.position_data[(vertex1_index * 4) + 0];
-				p1[1] = _object.position_data[(vertex1_index * 4) + 1];
-				p1[2] = _object.position_data[(vertex1_index * 4) + 2];
-
-				p2[0] = _object.position_data[(vertex2_index * 4) + 0];
-				p2[1] = _object.position_data[(vertex2_index * 4) + 1];
-				p2[2] = _object.position_data[(vertex2_index * 4) + 2];
-
-				p3[0] = _object.position_data[(vertex3_index * 4) + 0];
-				p3[1] = _object.position_data[(vertex3_index * 4) + 1];
-				p3[2] = _object.position_data[(vertex3_index * 4) + 2];
-
-				vsub(p1p2, p2, p1);
-				vsub(p1p3, p3, p1);
-
-				vsub(p2p1, p1, p2);
-				vsub(p2p3, p3, p2);
-
-				vsub(p3p1, p1, p3);
-				vsub(p3p2, p2, p3);
-
-				if
-				(
-					// point inside box
-					testPointInsideBox(p1, min, max) ||
-					testPointInsideBox(p2, min, max) ||
-					testPointInsideBox(p3, min, max) ||
-
-					// edge intersects box
-					(testRayBoxIntersection(p1, p1p2, min, max) && testRayBoxIntersection(p2, p2p1, min, max)) ||
-					(testRayBoxIntersection(p2, p2p3, min, max) && testRayBoxIntersection(p3, p3p2, min, max)) ||
-					(testRayBoxIntersection(p3, p3p1, min, max) && testRayBoxIntersection(p1, p1p3, min, max))
-				)
-				{
-					return true;
-				}
-
-				return false;
-			};
-
-
-
-			class BoxTree
-			{
-				constructor ()
-				{
-					this._data = new ArrayBuffer(1024 * 1024 * 4);
-					this.data_ui32 = new Uint32Array(this._data);
-					this.data_f32 = new Float32Array(this._data);
-
-					this.triangles_data = new Uint32Array(1024 * 1024);
-					this.triangle_count = 0;
-				}
-
-				test ()
-				{
-					scene.original_struct.objects.forEach
-					(
-						(elm) =>
-						{
-							const ob = Object.getInstance(elm);
-
-							const _min = ob.original_struct.bounding_box_min;
-							const _max = ob.original_struct.bounding_box_max;
-
-							const min = new Float32Array(3);
-							const max = new Float32Array(3);
-
-							const step = (_max[0] - _min[0]) / dimension_segment_count;
-
-							let box_index = 0;
-
-							this.data_f32[box_index + 0] = _min[0];
-							this.data_f32[box_index + 1] = _min[1];
-							this.data_f32[box_index + 2] = _min[2];
-
-							this.data_ui32[box_index + 3] = dimension_segment_count;
-
-							this.data_f32[box_index + 4] = _max[0];
-							this.data_f32[box_index + 5] = _max[1];
-							this.data_f32[box_index + 6] = _max[2];
-
-							for (let x = 0; x < dimension_segment_count; ++x)
-							{
-								for (let y = 0; y < dimension_segment_count; ++y)
-								{
-									for (let z = 0; z < dimension_segment_count; ++z)
-									{
-										box_index = (x * dimension_segment_count * dimension_segment_count + y * dimension_segment_count + z + 1) * 8;
-
-										min[0] = _min[0] + (step * x);
-										min[1] = _min[1] + (step * y);
-										min[2] = _min[2] + (step * z);
-
-										max[0] = min[0] + step;
-										max[1] = min[1] + step;
-										max[2] = min[2] + step;
-
-
-
-										const triangle_start = this.triangle_count;
-
-										for (let i = 0, i_max = ob.original_struct.index_data.length; i < i_max; i += 4)
-										{
-											if (testTriangle(i, min, max, ob.original_struct))
-											{
-												this.triangles_data[this.triangle_count++] = i / 4;
-											}
-										}
-
-										const triangle_end = this.triangle_count;
-
-
-
-										this.data_f32[box_index + 0] = min[0];
-										this.data_f32[box_index + 1] = min[1];
-										this.data_f32[box_index + 2] = min[2];
-
-										this.data_ui32[box_index + 3] = triangle_start;
-
-										this.data_f32[box_index + 4] = max[0];
-										this.data_f32[box_index + 5] = max[1];
-										this.data_f32[box_index + 6] = max[2];
-
-										this.data_ui32[box_index + 7] = triangle_end;
-									}
-								}
-							}
-						},
-					);
-				}
-			}
-
-
-
-			const sphere_object = new BoxTree();
-
-			sphere_object.test();
-
-			tree_data = sphere_object.data_ui32;
-			tri_data = sphere_object.triangles_data;
-		}
-
-
-
 		const surface_uniform_block_camera =
 			UniformBlock.getInstance
 			(wasm_wrapper.Addr(wasm_wrapper.exports.surface_uniform_block_camera.value));
 
-		const tree_storage_block = new StorageBlock3(tree_data, 3);
-		const tri_storage_block = new StorageBlock3(tri_data, 1);
+		const tree_storage_block = new StorageBlock3(scene.original_struct.boxes, 3);
+		const tri_storage_block = new StorageBlock3(scene.original_struct.triangles, 1);
 
 
 
@@ -520,9 +287,10 @@ window.addEventListener
 
 // controls.update();
 
-// // const sphere = new THREE.SphereGeometry(15, 64, 64);
+// const sphere = new THREE.SphereGeometry(15, 64, 64);
 // // const sphere = new THREE.TorusGeometry(15, 3, 200, 16);
-// const sphere = new THREE.TorusKnotGeometry(10, 3, 80, 16);
+// // const sphere = new THREE.TorusKnotGeometry(10, 3, 80, 16);
+// sphere.translate(2, 0, 0);
 
 // const pointer = new THREE.Mesh(new THREE.SphereGeometry(2, 32, 16), new THREE.MeshBasicMaterial({ wireframe: false, color: 'blue' }));
 
@@ -1042,12 +810,32 @@ window.addEventListener
 // 			}
 // 		}
 
-// 		const _min = Math.max(Math.max(Math.abs(min[0]), Math.abs(min[1])), Math.abs(min[2]));
-// 		const _max = Math.max(Math.max(Math.abs(max[0]), Math.abs(max[1])), Math.abs(max[2]));
+// 		const center =
+// 			new Float32Array
+// 			([
+// 				(min[0] + max[0]) * 0.5,
+// 				(min[1] + max[1]) * 0.5,
+// 				(min[2] + max[2]) * 0.5,
+// 			]);
+
+// 		LOG('center', ...center)
+
+// 		const _min = Math.max(Math.max(Math.abs(min[0] - center[0]), Math.abs(min[1] - center[1])), Math.abs(min[2] - center[2]));
+// 		const _max = Math.max(Math.max(Math.abs(max[0] - center[0]), Math.abs(max[1] - center[1])), Math.abs(max[2] - center[2]));
 // 		const __max = Math.max(_min, _max);
 
-// 		min.fill(-__max);
-// 		max.fill(__max);
+// 		// min.fill(-__max);
+// 		// max.fill(__max);
+
+// 		LOG(_min, _max)
+
+// 		min[0] = center[0] - __max;
+// 		min[1] = center[1] - __max;
+// 		min[2] = center[2] - __max;
+
+// 		max[0] = center[0] + __max;
+// 		max[1] = center[1] + __max;
+// 		max[2] = center[2] + __max;
 
 // 		this.min = min;
 // 		this.max = max;
@@ -1055,6 +843,9 @@ window.addEventListener
 
 // 	test ()
 // 	{
+// 		// let tmin = Infinity;
+// 		// let tmax = -Infinity;
+
 // 		const min = new Float32Array(3);
 // 		const max = new Float32Array(3);
 
@@ -1092,22 +883,32 @@ window.addEventListener
 
 // 					const triangle_end = this.triangle_count;
 
+// 					// if (triangle_end - triangle_start > tmax)
+// 					// {
+// 					// 	tmax = triangle_end - triangle_start;
+// 					// }
+
+// 					// if (triangle_end - triangle_start < tmin && triangle_end - triangle_start !== 0)
+// 					// {
+// 					// 	tmin = triangle_end - triangle_start;
+// 					// }
 
 
-// 					if (triangle_end - triangle_start !== 0)
-// 					{
-// 						const size = max[0] - min[0];
 
-// 						const box = new THREE.Mesh(new THREE.BoxGeometry(size, size, size), new THREE.MeshBasicMaterial({ wireframe: true, color: 'green' }));
+// 					// if (triangle_end - triangle_start !== 0)
+// 					// {
+// 						// const size = max[0] - min[0];
 
-// 						box.position.set((max[0] + min[0]) * 0.5, (max[1] + min[1]) * 0.5, (max[2] + min[2]) * 0.5);
+// 						// const box = new THREE.Mesh(new THREE.BoxGeometry(size, size, size), new THREE.MeshBasicMaterial({ wireframe: true, color: 'green' }));
 
-// 						scene.add(box);
-// 					}
-// 					else
-// 					{
-// 						LOG(x, y, z)
-// 					}
+// 						// box.position.set((max[0] + min[0]) * 0.5, (max[1] + min[1]) * 0.5, (max[2] + min[2]) * 0.5);
+
+// 						// scene.add(box);
+// 					// }
+// 					// else
+// 					// {
+// 					// 	LOG(x, y, z)
+// 					// }
 
 
 
@@ -1124,6 +925,9 @@ window.addEventListener
 // 				}
 // 			}
 // 		}
+
+// 		// LOG('tmin', tmin)
+// 		// LOG('tmax', tmax)
 // 	}
 // }
 
@@ -1178,12 +982,18 @@ window.addEventListener
 
 // 		if (getRayBoxIntersection(ray_origin, ray_direction, sphere_object.min, sphere_object.max, intersection_box, intersection_box_far1))
 // 		{
+// 			// pointer2.position.set((min[0] + max[0]) * 0.5, (min[1] + max[1]) * 0.5, (min[2] + max[2]) * 0.5);
+
 // 			const size = sphere_object.max[0] - sphere_object.min[0];
 // 			const segment_size = size / dimension_segment_count;
 
-// 			let x = Math.floor((intersection_box[0] + (size * 0.5)) / segment_size);
-// 			let y = Math.floor((intersection_box[1] + (size * 0.5)) / segment_size);
-// 			let z = Math.floor((intersection_box[2] + (size * 0.5)) / segment_size);
+// 			// let x = Math.floor((intersection_box[0] + (size * 0.5)) / segment_size);
+// 			// let y = Math.floor((intersection_box[1] + (size * 0.5)) / segment_size);
+// 			// let z = Math.floor((intersection_box[2] + (size * 0.5)) / segment_size);
+
+// 			let x = Math.floor((intersection_box[0] - sphere_object.min[0]) / segment_size);
+// 			let y = Math.floor((intersection_box[1] - sphere_object.min[1]) / segment_size);
+// 			let z = Math.floor((intersection_box[2] - sphere_object.min[2]) / segment_size);
 
 // 			x === -1 && (++x);
 // 			y === -1 && (++y);
@@ -1266,6 +1076,9 @@ window.addEventListener
 // 						pointer.position.set(...intersection);
 // 						pointer2.position.set((min[0] + max[0]) * 0.5, (min[1] + max[1]) * 0.5, (min[2] + max[2]) * 0.5);
 
+// 						// LOG(...intersection)
+// 						// return;
+
 // 						break;
 // 					}
 // 				}
@@ -1347,7 +1160,7 @@ window.addEventListener
 // 				y === dimension_segment_count && (--y);
 // 				z === dimension_segment_count && (--z);
 
-// 				LOG(x, y, z)
+// 				// LOG(x, y, z)
 
 // 				// next box index
 // 				box_index = (x * dimension_segment_count * dimension_segment_count + y * dimension_segment_count + z) * 8;
