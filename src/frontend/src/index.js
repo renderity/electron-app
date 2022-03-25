@@ -49,17 +49,17 @@ window.addEventListener
 
 
 
-		const renderer_addr = wasm_wrapper.Addr(wasm_wrapper.exports.renderer.value)[0];
-		const scene_addr = wasm_wrapper.Addr(wasm_wrapper.exports.scene.value)[0];
-		const object_addr = wasm_wrapper.Addr(wasm_wrapper.exports._object.value)[0];
-		const object2_addr = wasm_wrapper.Addr(wasm_wrapper.exports.object2.value)[0];
-		const surface_material_addr = wasm_wrapper.Addr(wasm_wrapper.exports.surface_material.value)[0];
-		const surface_object_addr = wasm_wrapper.Addr(wasm_wrapper.exports.surface_object.value)[0];
+		const [ renderer_addr ] = wasm_wrapper.Addr(wasm_wrapper.exports.renderer.value);
+		const [ scene_addr ] = wasm_wrapper.Addr(wasm_wrapper.exports.scene.value);
+		const [ object_addr ] = wasm_wrapper.Addr(wasm_wrapper.exports._object.value);
+		const [ object2_addr ] = wasm_wrapper.Addr(wasm_wrapper.exports.object2.value);
+		const [ surface_material_addr ] = wasm_wrapper.Addr(wasm_wrapper.exports.surface_material.value);
+		const [ surface_object_addr ] = wasm_wrapper.Addr(wasm_wrapper.exports.surface_object.value);
 
 
 
 		{
-			const orbit = wasm_wrapper.Addr(wasm_wrapper.exports.orbit.value)[0];
+			const [ orbit ] = wasm_wrapper.Addr(wasm_wrapper.exports.orbit.value);
 
 			const RDTY_MATH_Orbit_rotate2 = wasm_wrapper.exports_demangled['RDTY::MATH::Orbit::rotate2(float,float)'];
 			const RDTY_MATH_Orbit_update = wasm_wrapper.exports_demangled['RDTY::MATH::Orbit::update()'];
@@ -92,9 +92,13 @@ window.addEventListener
 		{
 			const three_geometry = new THREE.SphereGeometry(10, 32, 32);
 
+			LOG(three_geometry.attributes.position.array)
+
 			three_geometry.translate(5, 0, 0);
 
-			const object_base = rdty_renderers.ObjectBase.getInstance(object2_addr);
+			LOG(three_geometry.attributes.position.array)
+
+			const object_base = rdty_renderers.ObjectBase.getInstance(object_addr);
 
 			const _pos = new Float32Array(three_geometry.attributes.position.array.length / 3 * 4);
 
@@ -123,9 +127,13 @@ window.addEventListener
 		{
 			const three_geometry = new THREE.SphereGeometry(10, 32, 32);
 
+			LOG(three_geometry.attributes.position.array)
+
 			three_geometry.translate(-5, 0, 0);
 
-			const object_base = rdty_renderers.ObjectBase.getInstance(object_addr);
+			LOG(three_geometry.attributes.position.array)
+
+			const object_base = rdty_renderers.ObjectBase.getInstance(object2_addr);
 
 			const _pos = new Float32Array(three_geometry.attributes.position.array.length / 3 * 4);
 
