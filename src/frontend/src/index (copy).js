@@ -80,7 +80,7 @@ window.addEventListener
 			const orbit = wasm_wrapper.Addr(wasm_wrapper.exports.orbit.value);
 			// const orbit2 = wasm_wrapper.Addr(wasm_wrapper.exports.orbit2.value);
 
-			const RDTY_MATH_Orbit_rotate2 = wasm_wrapper.exports_demangled['RDTY::MATH::Orbit::rotate2(float,float)'];
+			const RDTY_MATH_Orbit_rotate2 = wasm_wrapper.exports_demangled['RDTY::MATH::Orbit::rotate3(float,float)'];
 			const RDTY_MATH_Orbit_update = wasm_wrapper.exports_demangled['RDTY::MATH::Orbit::update()'];
 
 			window.addEventListener
@@ -829,8 +829,8 @@ window.addEventListener
 
 
 					const scene = Scene.getInstance(scene_addr);
-					const material = Material.getInstance(material_addr, Material.ShaderUsage.GLSL_VULKAN);
-					const material2 = Material.getInstance(material2_addr, Material.ShaderUsage.GLSL_VULKAN);
+					const material = Material.getInstance(material_addr, Material.ShaderUsage.GLSL);
+					const material2 = Material.getInstance(material2_addr, Material.ShaderUsage.GLSL);
 					// const uniform_block0 = UniformBlock.getInstance(uniform_block0_addr);
 					const desc_set1 = DescriptorSet.getInstance(desc_set1_addr);
 					const desc_set2 = DescriptorSet.getInstance(desc_set2_addr);
@@ -879,7 +879,7 @@ window.addEventListener
 
 					const surface_material =
 						Material.getInstance
-						(surface_material_addr, Material.ShaderUsage.GLSL_VULKAN, [ scene.descriptor_set ]);
+						(surface_material_addr, Material.ShaderUsage.GLSL, [ scene.descriptor_set ]);
 
 					const surface_object = Object.getInstance(surface_object_addr);
 

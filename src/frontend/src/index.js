@@ -49,20 +49,37 @@ window.addEventListener
 
 
 
-		const [ renderer_addr ] = wasm_wrapper.Addr(wasm_wrapper.exports.renderer.value);
-		const [ scene_addr ] = wasm_wrapper.Addr(wasm_wrapper.exports.scene.value);
-		const [ object_addr ] = wasm_wrapper.Addr(wasm_wrapper.exports._object.value);
-		const [ object2_addr ] = wasm_wrapper.Addr(wasm_wrapper.exports.object2.value);
-		const [ surface_material_addr ] = wasm_wrapper.Addr(wasm_wrapper.exports.surface_material.value);
-		const [ surface_object_addr ] = wasm_wrapper.Addr(wasm_wrapper.exports.surface_object.value);
+		const [ renderer_addr ] = wasm_wrapper.Addr2('renderer');
+		const [ scene_addr ] = wasm_wrapper.Addr2('scene');
+		const [ object_addr ] = wasm_wrapper.Addr2('_object');
+		const [ object2_addr ] = wasm_wrapper.Addr2('object2');
+		const [ surface_material_addr ] = wasm_wrapper.Addr2('surface_material');
+		const [ surface_object_addr ] = wasm_wrapper.Addr2('surface_object');
 
 
 
 		{
-			const [ orbit ] = wasm_wrapper.Addr(wasm_wrapper.exports.orbit.value);
+			// const [ orbit ] = wasm_wrapper.Addr2('orbit');
 
-			const RDTY_MATH_Orbit_rotate2 = wasm_wrapper.exports_demangled['RDTY::MATH::Orbit::rotate2(float,float)'];
-			const RDTY_MATH_Orbit_update = wasm_wrapper.exports_demangled['RDTY::MATH::Orbit::update()'];
+			// const RDTY_MATH_Orbit_rotate2 = wasm_wrapper.exports_demangled['RDTY::MATH::Orbit::rotate3(float,float)'];
+			// const RDTY_MATH_Orbit_update = wasm_wrapper.exports_demangled['RDTY::MATH::Orbit::update()'];
+
+			// window.addEventListener
+			// (
+			// 	'mousemove',
+
+			// 	(evt) =>
+			// 	{
+			// 		RDTY_MATH_Orbit_rotate2(orbit, evt.movementX * 0.01, evt.movementY * 0.01);
+			// 		RDTY_MATH_Orbit_update(orbit);
+
+			// 		wasm_wrapper.exports.startTransition();
+			// 	},
+			// );
+
+			const Orbit = wasm_wrapper.Class('RDTY::MATH::Orbit');
+
+			const orbit = new Orbit('orbit');
 
 			window.addEventListener
 			(
@@ -70,8 +87,8 @@ window.addEventListener
 
 				(evt) =>
 				{
-					RDTY_MATH_Orbit_rotate2(orbit, evt.movementX * 0.01, evt.movementY * 0.01);
-					RDTY_MATH_Orbit_update(orbit);
+					orbit.rotate3(evt.movementX * 0.01, evt.movementY * 0.01);
+					orbit.update();
 
 					wasm_wrapper.exports.startTransition();
 				},
@@ -92,13 +109,13 @@ window.addEventListener
 		{
 			const three_geometry = new THREE.SphereGeometry(10, 32, 32);
 
-			LOG(three_geometry.attributes.position.array)
+			// LOG(three_geometry.attributes.position.array)
 
-			three_geometry.translate(5, 0, 0);
+			three_geometry.translate(1, 0, 0);
 
-			LOG(three_geometry.attributes.position.array)
+			// LOG(three_geometry.attributes.position.array)
 
-			const object_base = rdty_renderers.ObjectBase.getInstance(object_addr);
+			const obj = rdty_renderers.ObjectBase.getInstance(object_addr);
 
 			const _pos = new Float32Array(three_geometry.attributes.position.array.length / 3 * 4);
 
@@ -118,22 +135,22 @@ window.addEventListener
 				_ind[(i * 4) + 2] = three_geometry.index.array[(i * 3) + 2];
 			}
 
-			object_base.updateStdVectorData('position_data', 'Float', _pos);
-			object_base.updateStdVectorData('index_data', 'Uint32', _ind);
+			obj.updateStdVectorData('position_data', 'Float', _pos);
+			obj.updateStdVectorData('index_data', 'Uint32', _ind);
 
-			LOG(object_base)
+			LOG(obj)
 		}
 
 		{
 			const three_geometry = new THREE.SphereGeometry(10, 32, 32);
 
-			LOG(three_geometry.attributes.position.array)
+			// LOG(three_geometry.attributes.position.array)
 
-			three_geometry.translate(-5, 0, 0);
+			three_geometry.translate(-2, 0, 0);
 
-			LOG(three_geometry.attributes.position.array)
+			// LOG(three_geometry.attributes.position.array)
 
-			const object_base = rdty_renderers.ObjectBase.getInstance(object2_addr);
+			const obj = rdty_renderers.ObjectBase.getInstance(object2_addr);
 
 			const _pos = new Float32Array(three_geometry.attributes.position.array.length / 3 * 4);
 
@@ -153,10 +170,10 @@ window.addEventListener
 				_ind[(i * 4) + 2] = three_geometry.index.array[(i * 3) + 2];
 			}
 
-			object_base.updateStdVectorData('position_data', 'Float', _pos);
-			object_base.updateStdVectorData('index_data', 'Uint32', _ind);
+			obj.updateStdVectorData('position_data', 'Float', _pos);
+			obj.updateStdVectorData('index_data', 'Uint32', _ind);
 
-			LOG(object_base)
+			LOG(obj)
 		}
 
 
@@ -200,9 +217,7 @@ window.addEventListener
 
 
 
-		const surface_uniform_block_camera =
-			UniformBlock.getInstance
-			(wasm_wrapper.Addr(wasm_wrapper.exports.surface_uniform_block_camera.value)[0]);
+		const surface_uniform_block_camera = UniformBlock.getInstance2('surface_uniform_block_camera');
 
 		const tree_storage_block = new StorageBlock3(scene.original_struct.boxes, 3);
 		const tri_storage_block = new StorageBlock3(scene.original_struct.triangles, 1);
@@ -214,7 +229,7 @@ window.addEventListener
 
 		const surface_material =
 			Material.getInstance
-			(surface_material_addr, Material.ShaderUsage.GLSL_VULKAN, [ scene.descriptor_set ]);
+			(surface_material_addr, Material.ShaderUsage.GLSL, [ scene.descriptor_set ]);
 
 		const surface_object = Object.getInstance(surface_object_addr);
 
