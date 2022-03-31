@@ -109,11 +109,7 @@ window.addEventListener
 		{
 			const three_geometry = new THREE.SphereGeometry(10, 32, 32);
 
-			// LOG(three_geometry.attributes.position.array)
-
-			three_geometry.translate(1, 0, 0);
-
-			// LOG(three_geometry.attributes.position.array)
+			three_geometry.translate(5, 0, 0);
 
 			const obj = rdty_renderers.ObjectBase.getInstance(object_addr);
 
@@ -137,18 +133,12 @@ window.addEventListener
 
 			obj.updateStdVectorData('position_data', 'Float', _pos);
 			obj.updateStdVectorData('index_data', 'Uint32', _ind);
-
-			LOG(obj)
 		}
 
 		{
 			const three_geometry = new THREE.SphereGeometry(10, 32, 32);
 
-			// LOG(three_geometry.attributes.position.array)
-
-			three_geometry.translate(-2, 0, 0);
-
-			// LOG(three_geometry.attributes.position.array)
+			three_geometry.translate(-5, 0, 0);
 
 			const obj = rdty_renderers.ObjectBase.getInstance(object2_addr);
 
@@ -172,8 +162,6 @@ window.addEventListener
 
 			obj.updateStdVectorData('position_data', 'Float', _pos);
 			obj.updateStdVectorData('index_data', 'Uint32', _ind);
-
-			LOG(obj)
 		}
 
 
@@ -213,7 +201,6 @@ window.addEventListener
 
 
 		const scene = Scene.getInstance(scene_addr);
-		LOG(scene)
 
 
 
