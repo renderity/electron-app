@@ -49,34 +49,7 @@ window.addEventListener
 
 
 
-		const [ renderer_addr ] = wasm_wrapper.Addr2('renderer');
-		const [ scene_addr ] = wasm_wrapper.Addr2('scene');
-		const [ object_addr ] = wasm_wrapper.Addr2('_object');
-		const [ object2_addr ] = wasm_wrapper.Addr2('object2');
-		const [ surface_material_addr ] = wasm_wrapper.Addr2('surface_material');
-		const [ surface_object_addr ] = wasm_wrapper.Addr2('surface_object');
-
-
-
 		{
-			// const [ orbit ] = wasm_wrapper.Addr2('orbit');
-
-			// const RDTY_MATH_Orbit_rotate2 = wasm_wrapper.exports_demangled['RDTY::MATH::Orbit::rotate3(float,float)'];
-			// const RDTY_MATH_Orbit_update = wasm_wrapper.exports_demangled['RDTY::MATH::Orbit::update()'];
-
-			// window.addEventListener
-			// (
-			// 	'mousemove',
-
-			// 	(evt) =>
-			// 	{
-			// 		RDTY_MATH_Orbit_rotate2(orbit, evt.movementX * 0.01, evt.movementY * 0.01);
-			// 		RDTY_MATH_Orbit_update(orbit);
-
-			// 		wasm_wrapper.exports.startTransition();
-			// 	},
-			// );
-
 			const Orbit = wasm_wrapper.Class('RDTY::MATH::Orbit');
 
 			const orbit = new Orbit('orbit');
@@ -107,11 +80,11 @@ window.addEventListener
 		// const three_geometry = new THREE.BoxGeometry(20, 20, 20, 32, 32, 32);
 
 		{
-			const three_geometry = new THREE.SphereGeometry(10, 32, 32);
+			const three_geometry = new THREE.SphereGeometry(10, 64, 64);
 
-			three_geometry.translate(5, 0, 0);
+			three_geometry.translate(-10, -10, 0);
 
-			const obj = rdty_renderers.ObjectBase.getInstance(object_addr);
+			const obj = rdty_renderers.ObjectBase.getInstance('_object');
 
 			const _pos = new Float32Array(three_geometry.attributes.position.array.length / 3 * 4);
 
@@ -120,6 +93,15 @@ window.addEventListener
 				_pos[(i * 4) + 0] = three_geometry.attributes.position.array[(i * 3) + 0];
 				_pos[(i * 4) + 1] = three_geometry.attributes.position.array[(i * 3) + 1];
 				_pos[(i * 4) + 2] = three_geometry.attributes.position.array[(i * 3) + 2];
+			}
+
+			const _norm = new Float32Array(three_geometry.attributes.normal.array.length / 3 * 4);
+
+			for (let i = 0; i < three_geometry.attributes.normal.array.length / 3; ++i)
+			{
+				_norm[(i * 4) + 0] = three_geometry.attributes.normal.array[(i * 3) + 0];
+				_norm[(i * 4) + 1] = three_geometry.attributes.normal.array[(i * 3) + 1];
+				_norm[(i * 4) + 2] = three_geometry.attributes.normal.array[(i * 3) + 2];
 			}
 
 			const _ind = new Uint32Array(three_geometry.index.array.length / 3 * 4);
@@ -132,15 +114,16 @@ window.addEventListener
 			}
 
 			obj.updateStdVectorData('position_data', 'Float', _pos);
+			obj.updateStdVectorData('normal_data', 'Float', _norm);
 			obj.updateStdVectorData('index_data', 'Uint32', _ind);
 		}
 
 		{
-			const three_geometry = new THREE.SphereGeometry(10, 32, 32);
+			const three_geometry = new THREE.TorusGeometry(5, 1.5, 80, 16);
 
-			three_geometry.translate(-5, 0, 0);
+			three_geometry.translate(-10, 10, 0);
 
-			const obj = rdty_renderers.ObjectBase.getInstance(object2_addr);
+			const obj = rdty_renderers.ObjectBase.getInstance('object2');
 
 			const _pos = new Float32Array(three_geometry.attributes.position.array.length / 3 * 4);
 
@@ -149,6 +132,15 @@ window.addEventListener
 				_pos[(i * 4) + 0] = three_geometry.attributes.position.array[(i * 3) + 0];
 				_pos[(i * 4) + 1] = three_geometry.attributes.position.array[(i * 3) + 1];
 				_pos[(i * 4) + 2] = three_geometry.attributes.position.array[(i * 3) + 2];
+			}
+
+			const _norm = new Float32Array(three_geometry.attributes.normal.array.length / 3 * 4);
+
+			for (let i = 0; i < three_geometry.attributes.normal.array.length / 3; ++i)
+			{
+				_norm[(i * 4) + 0] = three_geometry.attributes.normal.array[(i * 3) + 0];
+				_norm[(i * 4) + 1] = three_geometry.attributes.normal.array[(i * 3) + 1];
+				_norm[(i * 4) + 2] = three_geometry.attributes.normal.array[(i * 3) + 2];
 			}
 
 			const _ind = new Uint32Array(three_geometry.index.array.length / 3 * 4);
@@ -161,6 +153,85 @@ window.addEventListener
 			}
 
 			obj.updateStdVectorData('position_data', 'Float', _pos);
+			obj.updateStdVectorData('normal_data', 'Float', _norm);
+			obj.updateStdVectorData('index_data', 'Uint32', _ind);
+		}
+
+		{
+			const three_geometry = new THREE.TorusKnotGeometry(5, 1.5, 80, 16);
+
+			three_geometry.translate(10, -10, 0);
+
+			const obj = rdty_renderers.ObjectBase.getInstance('object3');
+
+			const _pos = new Float32Array(three_geometry.attributes.position.array.length / 3 * 4);
+
+			for (let i = 0; i < three_geometry.attributes.position.array.length / 3; ++i)
+			{
+				_pos[(i * 4) + 0] = three_geometry.attributes.position.array[(i * 3) + 0];
+				_pos[(i * 4) + 1] = three_geometry.attributes.position.array[(i * 3) + 1];
+				_pos[(i * 4) + 2] = three_geometry.attributes.position.array[(i * 3) + 2];
+			}
+
+			const _norm = new Float32Array(three_geometry.attributes.normal.array.length / 3 * 4);
+
+			for (let i = 0; i < three_geometry.attributes.normal.array.length / 3; ++i)
+			{
+				_norm[(i * 4) + 0] = three_geometry.attributes.normal.array[(i * 3) + 0];
+				_norm[(i * 4) + 1] = three_geometry.attributes.normal.array[(i * 3) + 1];
+				_norm[(i * 4) + 2] = three_geometry.attributes.normal.array[(i * 3) + 2];
+			}
+
+			const _ind = new Uint32Array(three_geometry.index.array.length / 3 * 4);
+
+			for (let i = 0; i < three_geometry.index.array.length / 3; ++i)
+			{
+				_ind[(i * 4) + 0] = three_geometry.index.array[(i * 3) + 0];
+				_ind[(i * 4) + 1] = three_geometry.index.array[(i * 3) + 1];
+				_ind[(i * 4) + 2] = three_geometry.index.array[(i * 3) + 2];
+			}
+
+			obj.updateStdVectorData('position_data', 'Float', _pos);
+			obj.updateStdVectorData('normal_data', 'Float', _norm);
+			obj.updateStdVectorData('index_data', 'Uint32', _ind);
+		}
+
+		{
+			const three_geometry = new THREE.BoxGeometry(20, 20, 20, 32, 32, 32);
+
+			three_geometry.translate(10, 10, 0);
+
+			const obj = rdty_renderers.ObjectBase.getInstance('object4');
+
+			const _pos = new Float32Array(three_geometry.attributes.position.array.length / 3 * 4);
+
+			for (let i = 0; i < three_geometry.attributes.position.array.length / 3; ++i)
+			{
+				_pos[(i * 4) + 0] = three_geometry.attributes.position.array[(i * 3) + 0];
+				_pos[(i * 4) + 1] = three_geometry.attributes.position.array[(i * 3) + 1];
+				_pos[(i * 4) + 2] = three_geometry.attributes.position.array[(i * 3) + 2];
+			}
+
+			const _norm = new Float32Array(three_geometry.attributes.normal.array.length / 3 * 4);
+
+			for (let i = 0; i < three_geometry.attributes.normal.array.length / 3; ++i)
+			{
+				_norm[(i * 4) + 0] = three_geometry.attributes.normal.array[(i * 3) + 0];
+				_norm[(i * 4) + 1] = three_geometry.attributes.normal.array[(i * 3) + 1];
+				_norm[(i * 4) + 2] = three_geometry.attributes.normal.array[(i * 3) + 2];
+			}
+
+			const _ind = new Uint32Array(three_geometry.index.array.length / 3 * 4);
+
+			for (let i = 0; i < three_geometry.index.array.length / 3; ++i)
+			{
+				_ind[(i * 4) + 0] = three_geometry.index.array[(i * 3) + 0];
+				_ind[(i * 4) + 1] = three_geometry.index.array[(i * 3) + 1];
+				_ind[(i * 4) + 2] = three_geometry.index.array[(i * 3) + 2];
+			}
+
+			obj.updateStdVectorData('position_data', 'Float', _pos);
+			obj.updateStdVectorData('normal_data', 'Float', _norm);
 			obj.updateStdVectorData('index_data', 'Uint32', _ind);
 		}
 
@@ -175,7 +246,7 @@ window.addEventListener
 		const renderer =
 			new webgpu.Renderer
 			(
-				renderer_addr,
+				'renderer',
 
 				{
 					canvas: document.querySelector('#webgpu'),
@@ -200,11 +271,12 @@ window.addEventListener
 
 
 
-		const scene = Scene.getInstance(scene_addr);
+		const scene = Scene.getInstance('scene');
+		LOG(scene)
 
 
 
-		const surface_uniform_block_camera = UniformBlock.getInstance2('surface_uniform_block_camera');
+		const surface_uniform_block_camera = UniformBlock.getInstance('surface_uniform_block_camera');
 
 		const tree_storage_block = new StorageBlock3(scene.original_struct.boxes, 3);
 		const tri_storage_block = new StorageBlock3(scene.original_struct.triangles, 1);
@@ -216,9 +288,10 @@ window.addEventListener
 
 		const surface_material =
 			Material.getInstance
-			(surface_material_addr, Material.ShaderUsage.GLSL, [ scene.descriptor_set ]);
+			('surface_material', Material.ShaderUsage.GLSL, [ scene.descriptor_set ]);
 
-		const surface_object = Object.getInstance(surface_object_addr);
+		const surface_object = Object.getInstance('surface_object');
+		LOG(surface_object)
 
 		surface_object.createBuffers();
 
