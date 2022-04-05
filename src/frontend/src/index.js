@@ -11,6 +11,7 @@ no-magic-numbers,
 import './index.scss';
 
 import * as THREE from 'three';
+// import { mergeVertices } from 'three/examples/jsm/utils/BufferGeometryUtils.js';
 
 import WasmWrapper from '../../../../wasm-wrapper/src/index.js';
 import RdtyRenderers from '../../../../renderers-web/src/index.js';
@@ -60,10 +61,10 @@ window.addEventListener
 
 				(evt) =>
 				{
-					orbit.rotate3(evt.movementX * 0.01, evt.movementY * 0.01);
+					orbit.rotate3(evt.movementY * 0.01, evt.movementX * 0.01);
 					orbit.update();
 
-					wasm_wrapper.exports.startTransition();
+					// wasm_wrapper.exports.startTransition();
 				},
 			);
 		}
@@ -80,11 +81,11 @@ window.addEventListener
 		// const three_geometry = new THREE.BoxGeometry(20, 20, 20, 32, 32, 32);
 
 		{
-			const three_geometry = new THREE.SphereGeometry(10, 64, 64);
+			const three_geometry = new THREE.SphereGeometry(10, 32, 32);
 
 			three_geometry.translate(-10, -10, 0);
 
-			const obj = rdty_renderers.ObjectBase.getInstance('_object');
+			const obj = rdty_renderers.ObjectBase.getInstance2('_object');
 
 			const _pos = new Float32Array(three_geometry.attributes.position.array.length / 3 * 4);
 
@@ -123,7 +124,7 @@ window.addEventListener
 
 			three_geometry.translate(-10, 10, 0);
 
-			const obj = rdty_renderers.ObjectBase.getInstance('object2');
+			const obj = rdty_renderers.ObjectBase.getInstance2('object2');
 
 			const _pos = new Float32Array(three_geometry.attributes.position.array.length / 3 * 4);
 
@@ -158,11 +159,14 @@ window.addEventListener
 		}
 
 		{
+			// LOG(mergeVertices)
+			// const three_geometry =
+			// 	mergeVertices(new THREE.TorusKnotGeometry(5, 1.5, 80, 16), 0.1);
 			const three_geometry = new THREE.TorusKnotGeometry(5, 1.5, 80, 16);
 
 			three_geometry.translate(10, -10, 0);
 
-			const obj = rdty_renderers.ObjectBase.getInstance('object3');
+			const obj = rdty_renderers.ObjectBase.getInstance2('object3');
 
 			const _pos = new Float32Array(three_geometry.attributes.position.array.length / 3 * 4);
 
@@ -201,7 +205,7 @@ window.addEventListener
 
 			three_geometry.translate(10, 10, 0);
 
-			const obj = rdty_renderers.ObjectBase.getInstance('object4');
+			const obj = rdty_renderers.ObjectBase.getInstance2('object4');
 
 			const _pos = new Float32Array(three_geometry.attributes.position.array.length / 3 * 4);
 
@@ -271,12 +275,12 @@ window.addEventListener
 
 
 
-		const scene = Scene.getInstance('scene');
+		const scene = Scene.getInstance2('scene');
 		LOG(scene)
 
 
 
-		const surface_uniform_block_camera = UniformBlock.getInstance('surface_uniform_block_camera');
+		const surface_uniform_block_camera = UniformBlock.getInstance2('surface_uniform_block_camera');
 
 		const tree_storage_block = new StorageBlock3(scene.original_struct.boxes, 3);
 		const tri_storage_block = new StorageBlock3(scene.original_struct.triangles, 1);
@@ -287,10 +291,10 @@ window.addEventListener
 		([ tree_storage_block, tri_storage_block, surface_uniform_block_camera ]);
 
 		const surface_material =
-			Material.getInstance
+			Material.getInstance2
 			('surface_material', Material.ShaderUsage.GLSL, [ scene.descriptor_set ]);
 
-		const surface_object = Object.getInstance('surface_object');
+		const surface_object = Object.getInstance2('surface_object');
 		LOG(surface_object)
 
 		surface_object.createBuffers();
