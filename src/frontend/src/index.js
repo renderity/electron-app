@@ -18,12 +18,10 @@ import RdtyRenderers from '../../../../renderers-web/src/index.js';
 
 import wasm_code from './cpp/src/entry-wasm32.cpp';
 
-import TestWorker from 'worker-loader!./test.worker.js';
-
 
 
 // Use window.navigator.hardwareConcurrency?
-const threads = [ ...new Array(2) ].map(() => new TestWorker());
+// const threads = [ ...new Array(2) ].map(() => new TransitionUpdateWorker());
 
 
 
@@ -45,11 +43,6 @@ window.addEventListener
 
 
 
-		threads.forEach
-		((thread, thread_index) => thread.postMessage({ thread_index, wasm_code, wasm_memory }));
-
-
-
 		{
 			const Orbit = wasm_wrapper.Class('RDTY::MATH::Orbit');
 
@@ -64,7 +57,7 @@ window.addEventListener
 					orbit.rotate3(evt.movementY * 0.01, evt.movementX * 0.01);
 					orbit.update();
 
-					// wasm_wrapper.exports.startTransition();
+					wasm_wrapper.exports.startTransition();
 				},
 			);
 		}
@@ -75,173 +68,117 @@ window.addEventListener
 
 
 
-		// const three_geometry = new THREE.SphereGeometry(10, 64, 64);
-		// const three_geometry = new THREE.TorusKnotGeometry(10, 3, 320, 32);
-		// const three_geometry = new THREE.TorusKnotGeometry(5, 1.5, 80, 16);
-		// const three_geometry = new THREE.BoxGeometry(20, 20, 20, 32, 32, 32);
-
-		{
-			const three_geometry = new THREE.SphereGeometry(10, 32, 32);
-
-			three_geometry.translate(-10, -10, 0);
-
-			const obj = rdty_renderers.ObjectBase.getInstance2('_object');
-
-			const _pos = new Float32Array(three_geometry.attributes.position.array.length / 3 * 4);
-
-			for (let i = 0; i < three_geometry.attributes.position.array.length / 3; ++i)
+		const object_descriptors =
+		[
 			{
-				_pos[(i * 4) + 0] = three_geometry.attributes.position.array[(i * 3) + 0];
-				_pos[(i * 4) + 1] = three_geometry.attributes.position.array[(i * 3) + 1];
-				_pos[(i * 4) + 2] = three_geometry.attributes.position.array[(i * 3) + 2];
-			}
+				name: '_object',
+				geometry: new THREE.SphereGeometry(10, 32, 32),
+				position: [ -10, -10, 0 ],
+			},
 
-			const _norm = new Float32Array(three_geometry.attributes.normal.array.length / 3 * 4);
-
-			for (let i = 0; i < three_geometry.attributes.normal.array.length / 3; ++i)
 			{
-				_norm[(i * 4) + 0] = three_geometry.attributes.normal.array[(i * 3) + 0];
-				_norm[(i * 4) + 1] = three_geometry.attributes.normal.array[(i * 3) + 1];
-				_norm[(i * 4) + 2] = three_geometry.attributes.normal.array[(i * 3) + 2];
-			}
+				name: 'object2',
+				geometry: new THREE.TorusGeometry(5, 1.5, 80, 16),
+				position: [ -10, 10, 0 ],
+			},
 
-			const _ind = new Uint32Array(three_geometry.index.array.length / 3 * 4);
-
-			for (let i = 0; i < three_geometry.index.array.length / 3; ++i)
 			{
-				_ind[(i * 4) + 0] = three_geometry.index.array[(i * 3) + 0];
-				_ind[(i * 4) + 1] = three_geometry.index.array[(i * 3) + 1];
-				_ind[(i * 4) + 2] = three_geometry.index.array[(i * 3) + 2];
-			}
+				name: 'object3',
+				geometry: new THREE.TorusKnotGeometry(5, 1.5, 80, 16),
+				position: [ 10, -10, 0 ],
+			},
 
-			obj.updateStdVectorData('position_data', 'Float', _pos);
-			obj.updateStdVectorData('normal_data', 'Float', _norm);
-			obj.updateStdVectorData('index_data', 'Uint32', _ind);
-		}
-
-		{
-			const three_geometry = new THREE.TorusGeometry(5, 1.5, 80, 16);
-
-			three_geometry.translate(-10, 10, 0);
-
-			const obj = rdty_renderers.ObjectBase.getInstance2('object2');
-
-			const _pos = new Float32Array(three_geometry.attributes.position.array.length / 3 * 4);
-
-			for (let i = 0; i < three_geometry.attributes.position.array.length / 3; ++i)
 			{
-				_pos[(i * 4) + 0] = three_geometry.attributes.position.array[(i * 3) + 0];
-				_pos[(i * 4) + 1] = three_geometry.attributes.position.array[(i * 3) + 1];
-				_pos[(i * 4) + 2] = three_geometry.attributes.position.array[(i * 3) + 2];
-			}
+				name: 'object4',
+				geometry: new THREE.BoxGeometry(20, 20, 20, 32, 32, 32),
+				position: [ 10, 10, 0 ],
+			},
+		]
+			.slice(0, 2);
 
-			const _norm = new Float32Array(three_geometry.attributes.normal.array.length / 3 * 4);
 
-			for (let i = 0; i < three_geometry.attributes.normal.array.length / 3; ++i)
-			{
-				_norm[(i * 4) + 0] = three_geometry.attributes.normal.array[(i * 3) + 0];
-				_norm[(i * 4) + 1] = three_geometry.attributes.normal.array[(i * 3) + 1];
-				_norm[(i * 4) + 2] = three_geometry.attributes.normal.array[(i * 3) + 2];
-			}
 
-			const _ind = new Uint32Array(three_geometry.index.array.length / 3 * 4);
+		object_descriptors
+			.forEach
+			(
+				(desc) =>
+				{
+					desc.geometry.translate(...desc.position);
 
-			for (let i = 0; i < three_geometry.index.array.length / 3; ++i)
-			{
-				_ind[(i * 4) + 0] = three_geometry.index.array[(i * 3) + 0];
-				_ind[(i * 4) + 1] = three_geometry.index.array[(i * 3) + 1];
-				_ind[(i * 4) + 2] = three_geometry.index.array[(i * 3) + 2];
-			}
+					const obj = rdty_renderers.ObjectBase.getInstance2(desc.name);
 
-			obj.updateStdVectorData('position_data', 'Float', _pos);
-			obj.updateStdVectorData('normal_data', 'Float', _norm);
-			obj.updateStdVectorData('index_data', 'Uint32', _ind);
-		}
+					const _pos = new Float32Array(desc.geometry.attributes.position.array.length / 3 * 4);
 
-		{
-			// LOG(mergeVertices)
-			// const three_geometry =
-			// 	mergeVertices(new THREE.TorusKnotGeometry(5, 1.5, 80, 16), 0.1);
-			const three_geometry = new THREE.TorusKnotGeometry(5, 1.5, 80, 16);
+					for (let i = 0; i < desc.geometry.attributes.position.array.length / 3; ++i)
+					{
+						_pos[(i * 4) + 0] = desc.geometry.attributes.position.array[(i * 3) + 0];
+						_pos[(i * 4) + 1] = desc.geometry.attributes.position.array[(i * 3) + 1];
+						_pos[(i * 4) + 2] = desc.geometry.attributes.position.array[(i * 3) + 2];
+					}
 
-			three_geometry.translate(10, -10, 0);
+					const _norm = new Float32Array(desc.geometry.attributes.normal.array.length / 3 * 4);
 
-			const obj = rdty_renderers.ObjectBase.getInstance2('object3');
+					for (let i = 0; i < desc.geometry.attributes.normal.array.length / 3; ++i)
+					{
+						_norm[(i * 4) + 0] = desc.geometry.attributes.normal.array[(i * 3) + 0];
+						_norm[(i * 4) + 1] = desc.geometry.attributes.normal.array[(i * 3) + 1];
+						_norm[(i * 4) + 2] = desc.geometry.attributes.normal.array[(i * 3) + 2];
+					}
 
-			const _pos = new Float32Array(three_geometry.attributes.position.array.length / 3 * 4);
+					const _ind = new Uint32Array(desc.geometry.index.array.length / 3 * 4);
 
-			for (let i = 0; i < three_geometry.attributes.position.array.length / 3; ++i)
-			{
-				_pos[(i * 4) + 0] = three_geometry.attributes.position.array[(i * 3) + 0];
-				_pos[(i * 4) + 1] = three_geometry.attributes.position.array[(i * 3) + 1];
-				_pos[(i * 4) + 2] = three_geometry.attributes.position.array[(i * 3) + 2];
-			}
+					for (let i = 0; i < desc.geometry.index.array.length / 3; ++i)
+					{
+						_ind[(i * 4) + 0] = desc.geometry.index.array[(i * 3) + 0];
+						_ind[(i * 4) + 1] = desc.geometry.index.array[(i * 3) + 1];
+						_ind[(i * 4) + 2] = desc.geometry.index.array[(i * 3) + 2];
+					}
 
-			const _norm = new Float32Array(three_geometry.attributes.normal.array.length / 3 * 4);
-
-			for (let i = 0; i < three_geometry.attributes.normal.array.length / 3; ++i)
-			{
-				_norm[(i * 4) + 0] = three_geometry.attributes.normal.array[(i * 3) + 0];
-				_norm[(i * 4) + 1] = three_geometry.attributes.normal.array[(i * 3) + 1];
-				_norm[(i * 4) + 2] = three_geometry.attributes.normal.array[(i * 3) + 2];
-			}
-
-			const _ind = new Uint32Array(three_geometry.index.array.length / 3 * 4);
-
-			for (let i = 0; i < three_geometry.index.array.length / 3; ++i)
-			{
-				_ind[(i * 4) + 0] = three_geometry.index.array[(i * 3) + 0];
-				_ind[(i * 4) + 1] = three_geometry.index.array[(i * 3) + 1];
-				_ind[(i * 4) + 2] = three_geometry.index.array[(i * 3) + 2];
-			}
-
-			obj.updateStdVectorData('position_data', 'Float', _pos);
-			obj.updateStdVectorData('normal_data', 'Float', _norm);
-			obj.updateStdVectorData('index_data', 'Uint32', _ind);
-		}
-
-		{
-			const three_geometry = new THREE.BoxGeometry(20, 20, 20, 32, 32, 32);
-
-			three_geometry.translate(10, 10, 0);
-
-			const obj = rdty_renderers.ObjectBase.getInstance2('object4');
-
-			const _pos = new Float32Array(three_geometry.attributes.position.array.length / 3 * 4);
-
-			for (let i = 0; i < three_geometry.attributes.position.array.length / 3; ++i)
-			{
-				_pos[(i * 4) + 0] = three_geometry.attributes.position.array[(i * 3) + 0];
-				_pos[(i * 4) + 1] = three_geometry.attributes.position.array[(i * 3) + 1];
-				_pos[(i * 4) + 2] = three_geometry.attributes.position.array[(i * 3) + 2];
-			}
-
-			const _norm = new Float32Array(three_geometry.attributes.normal.array.length / 3 * 4);
-
-			for (let i = 0; i < three_geometry.attributes.normal.array.length / 3; ++i)
-			{
-				_norm[(i * 4) + 0] = three_geometry.attributes.normal.array[(i * 3) + 0];
-				_norm[(i * 4) + 1] = three_geometry.attributes.normal.array[(i * 3) + 1];
-				_norm[(i * 4) + 2] = three_geometry.attributes.normal.array[(i * 3) + 2];
-			}
-
-			const _ind = new Uint32Array(three_geometry.index.array.length / 3 * 4);
-
-			for (let i = 0; i < three_geometry.index.array.length / 3; ++i)
-			{
-				_ind[(i * 4) + 0] = three_geometry.index.array[(i * 3) + 0];
-				_ind[(i * 4) + 1] = three_geometry.index.array[(i * 3) + 1];
-				_ind[(i * 4) + 2] = three_geometry.index.array[(i * 3) + 2];
-			}
-
-			obj.updateStdVectorData('position_data', 'Float', _pos);
-			obj.updateStdVectorData('normal_data', 'Float', _norm);
-			obj.updateStdVectorData('index_data', 'Uint32', _ind);
-		}
+					obj.updateStdVectorData('position_data', 'Float', _pos);
+					obj.updateStdVectorData('normal_data', 'Float', _norm);
+					obj.updateStdVectorData('index_data', 'Uint32', _ind);
+				},
+			);
 
 
 
 		wasm_wrapper.exports.constructRenderityWrappers2();
+
+
+
+		const thr1 = new wasm_wrapper.Thread('generateBoxes', [ wasm_wrapper.Addr2('_object')[0] ]);
+
+		await thr1.join();
+
+		const thr2 = new wasm_wrapper.Thread('generateBoxes', [ wasm_wrapper.Addr2('object2')[0] ]);
+
+		await thr2.join();
+
+
+
+		// object_descriptors
+		// 	.reverse()
+		// 	.forEach
+		// 	(
+		// 		(desc) =>
+		// 		{
+		// 			LOG('object_name', desc.name)
+		// 			const [ scene_addr ] = wasm_wrapper.Addr2('scene');
+		// 			const [ object_addr ] = wasm_wrapper.Addr2(desc.name);
+
+		// 			wasm_wrapper.exports._ZN4RDTY8WRAPPERS5Scene5test2EPNS0_6ObjectE(scene_addr, object_addr);
+		// 		},
+		// 	);
+
+		LOG('finish')
+
+
+
+		// threads.forEach
+		// ((thread, thread_index) => thread.postMessage({ wasm_code, wasm_memory, thread_index }));
+
+		const thr3 = new wasm_wrapper.Thread('updateTransitions', [ wasm_wrapper.Addr2('_stack0')[0] ], true);
+		const thr4 = new wasm_wrapper.Thread('updateTransitions', [ wasm_wrapper.Addr2('_stack1')[0] ], true);
 
 
 
