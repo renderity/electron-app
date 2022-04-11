@@ -146,39 +146,26 @@ window.addEventListener
 
 
 
-		const thr1 = new wasm_wrapper.Thread('generateBoxes', [ wasm_wrapper.Addr2('_object')[0] ]);
+
+		const t = Date.now();
+		LOG(wasm_wrapper.Addr2('p1')[0], wasm_wrapper.Addr2('p2')[0])
+		const thr1 = new wasm_wrapper.Thread('generateBoxes', [ wasm_wrapper.Addr2('_object')[0], wasm_wrapper.Addr2('p1')[0], wasm_wrapper.Addr2('_min1')[0], wasm_wrapper.Addr2('_max1')[0] ], false, 1024 * 1024);
+
+		const thr2 = new wasm_wrapper.Thread('generateBoxes', [ wasm_wrapper.Addr2('object2')[0], wasm_wrapper.Addr2('p2')[0], wasm_wrapper.Addr2('_min2')[0], wasm_wrapper.Addr2('_max2')[0] ], false, 1024 * 1024 * 2);
 
 		await thr1.join();
-
-		const thr2 = new wasm_wrapper.Thread('generateBoxes', [ wasm_wrapper.Addr2('object2')[0] ]);
-
 		await thr2.join();
 
+		LOG(Date.now() - t)
 
 
-		// object_descriptors
-		// 	.reverse()
-		// 	.forEach
-		// 	(
-		// 		(desc) =>
-		// 		{
-		// 			LOG('object_name', desc.name)
-		// 			const [ scene_addr ] = wasm_wrapper.Addr2('scene');
-		// 			const [ object_addr ] = wasm_wrapper.Addr2(desc.name);
-
-		// 			wasm_wrapper.exports._ZN4RDTY8WRAPPERS5Scene5test2EPNS0_6ObjectE(scene_addr, object_addr);
-		// 		},
-		// 	);
 
 		LOG('finish')
 
 
 
-		// threads.forEach
-		// ((thread, thread_index) => thread.postMessage({ wasm_code, wasm_memory, thread_index }));
-
-		const thr3 = new wasm_wrapper.Thread('updateTransitions', [ wasm_wrapper.Addr2('_stack0')[0] ], true);
-		const thr4 = new wasm_wrapper.Thread('updateTransitions', [ wasm_wrapper.Addr2('_stack1')[0] ], true);
+		new wasm_wrapper.Thread('updateTransitions', [ wasm_wrapper.Addr2('_stack0')[0] ], true);
+		new wasm_wrapper.Thread('updateTransitions', [ wasm_wrapper.Addr2('_stack1')[0] ], true);
 
 
 
@@ -232,7 +219,6 @@ window.addEventListener
 			('surface_material', Material.ShaderUsage.GLSL, [ scene.descriptor_set ]);
 
 		const surface_object = Object.getInstance2('surface_object');
-		LOG(surface_object)
 
 		surface_object.createBuffers();
 
