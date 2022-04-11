@@ -69,7 +69,13 @@
 				"do": "genmake $(ENV) $(REPS)/renderity/aux/genmake.json"
 			},
 
-			"$(REPS)/renderity/wasm-wrapper/src/aux.cpp"
+			"$(REPS)/renderity/wasm-wrapper/src/aux.cpp",
+
+			{
+				"file": "$(REPS)/renderity/wasm-wrapper/src/set-stack-pointer.s",
+
+				"flags": "$(NO_LINK)"
+			}
 		]
 	}
 }
