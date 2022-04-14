@@ -20,31 +20,26 @@ import wasm_code from './cpp/src/entry-wasm32.cpp';
 
 
 
-// Use window.navigator.hardwareConcurrency?
-// const threads = [ ...new Array(2) ].map(() => new TransitionUpdateWorker());
-
-
-
 window.addEventListener
 (
 	'load',
 
 	async () =>
 	{
-		const wasm_wrapper = new WasmWrapper();
+		const wasm = new WasmWrapper();
 
 		// 4gb == 65536 pages
 		const wasm_memory = new WebAssembly.Memory({ initial: 65536, maximum: 65536, shared: true });
 
-		await wasm_wrapper.init(wasm_code, wasm_memory);
+		await wasm.init(wasm_code, wasm_memory);
 
-		wasm_wrapper.exports.initTransitionStack();
-		wasm_wrapper.exports.constructRenderityWrappers();
+		wasm.exports.initTransitionStack();
+		wasm.exports.constructRenderityWrappers();
 
 
 
 		{
-			const Orbit = wasm_wrapper.Class('RDTY::MATH::Orbit');
+			const Orbit = wasm.Class('RDTY::MATH::Orbit');
 
 			const orbit = new Orbit('orbit');
 
@@ -57,14 +52,14 @@ window.addEventListener
 					orbit.rotate3(evt.movementY * 0.01, evt.movementX * 0.01);
 					orbit.update();
 
-					wasm_wrapper.exports.startTransition();
+					wasm.exports.startTransition();
 				},
 			);
 		}
 
 
 
-		const rdty_renderers = new RdtyRenderers(wasm_wrapper);
+		const rdty_renderers = new RdtyRenderers(wasm);
 
 
 
@@ -94,7 +89,7 @@ window.addEventListener
 				position: [ 10, 10, 0 ],
 			},
 		]
-			.slice(0, 2);
+			.slice(0, 4);
 
 
 
@@ -142,34 +137,33 @@ window.addEventListener
 
 
 
-		wasm_wrapper.exports.constructRenderityWrappers2();
-
+		wasm.exports.constructRenderityWrappers2();
 
 
 
 		const t = Date.now();
-		LOG(wasm_wrapper.Addr2('p1')[0], wasm_wrapper.Addr2('p2')[0])
-		const thr1 = new wasm_wrapper.Thread('generateBoxes', [ wasm_wrapper.Addr2('_object')[0], wasm_wrapper.Addr2('p1')[0], wasm_wrapper.Addr2('_min1')[0], wasm_wrapper.Addr2('_max1')[0] ], false, 1024 * 1024);
 
-		const thr2 = new wasm_wrapper.Thread('generateBoxes', [ wasm_wrapper.Addr2('object2')[0], wasm_wrapper.Addr2('p2')[0], wasm_wrapper.Addr2('_min2')[0], wasm_wrapper.Addr2('_max2')[0] ], false, 1024 * 1024 * 2);
+		const thr1 = new wasm.Thread('generateBoxes', [ wasm.Addr2('_object')[0] ]);
+		const thr2 = new wasm.Thread('generateBoxes', [ wasm.Addr2('object2')[0] ]);
+		const thr3 = new wasm.Thread('generateBoxes', [ wasm.Addr2('object3')[0] ]);
+		const thr4 = new wasm.Thread('generateBoxes', [ wasm.Addr2('object4')[0] ]);
 
 		await thr1.join();
 		await thr2.join();
+		await thr3.join();
+		await thr4.join();
 
 		LOG(Date.now() - t)
 
 
 
-		LOG('finish')
+		// Use window.navigator.hardwareConcurrency?
+		new wasm.Thread('updateTransitions', [ wasm.Addr2('_stack0')[0] ], true);
+		new wasm.Thread('updateTransitions', [ wasm.Addr2('_stack1')[0] ], true);
 
 
 
-		new wasm_wrapper.Thread('updateTransitions', [ wasm_wrapper.Addr2('_stack0')[0] ], true);
-		new wasm_wrapper.Thread('updateTransitions', [ wasm_wrapper.Addr2('_stack1')[0] ], true);
-
-
-
-		const webgpu = new rdty_renderers.WebGPU(wasm_wrapper);
+		const webgpu = new rdty_renderers.WebGPU(wasm);
 
 		const renderer =
 			new webgpu.Renderer

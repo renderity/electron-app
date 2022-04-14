@@ -72,7 +72,7 @@
 			"$(REPS)/renderity/wasm-wrapper/src/aux.cpp",
 
 			{
-				"file": "$(REPS)/renderity/wasm-wrapper/src/set-stack-pointer.s",
+				"file": "$(REPS)/renderity/wasm-wrapper/src/set-stack-pointer-$(ARCH).s",
 
 				"flags": "$(NO_LINK)"
 			}

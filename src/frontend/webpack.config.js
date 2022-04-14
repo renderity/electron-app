@@ -129,7 +129,7 @@ module.exports = (env) =>
 					{ from: 'src/public', to: 'public' },
 
 					// This is to be able to use inline threads.
-					{ from: path.join(__dirname, '../../../wasm-wrapper/src'), to: 'public/wasm-wrapper' },
+					{ from: path.join(__dirname, '../../../wasm-wrapper/src/thread.js'), to: 'public/wasm-wrapper' },
 				],
 			}),
 
