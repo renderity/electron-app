@@ -126,6 +126,8 @@ module.exports = (env) =>
 			({
 				patterns:
 				[
+					{ from: 'src/_headers', to: '_headers', toType: 'file' },
+
 					{ from: 'src/public', to: 'public' },
 
 					// This is to be able to use inline threads.
