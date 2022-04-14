@@ -126,6 +126,7 @@ module.exports = (env) =>
 			({
 				patterns:
 				[
+					// For Netlify.
 					{ from: 'src/_headers', to: '_headers', toType: 'file' },
 
 					{ from: 'src/public', to: 'public' },
