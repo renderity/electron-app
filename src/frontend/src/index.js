@@ -86,6 +86,7 @@ window.addEventListener
 			{
 				name: 'object4',
 				geometry: new THREE.BoxGeometry(20, 20, 20, 32, 32, 32),
+				// geometry: new THREE.PlaneGeometry(20, 20, 32, 32).rotateX(Math.PI * 0.5),
 				position: [ 10, 10, 0 ],
 			},
 		]
@@ -157,9 +158,9 @@ window.addEventListener
 
 
 
-		// Use window.navigator.hardwareConcurrency?
-		new wasm.Thread('updateTransitions', [ wasm.Addr2('_stack0')[0] ], true);
-		new wasm.Thread('updateTransitions', [ wasm.Addr2('_stack1')[0] ], true);
+		// // Use window.navigator.hardwareConcurrency?
+		// new wasm.Thread('updateTransitions', [ wasm.Addr2('_stack0')[0] ], true);
+		// new wasm.Thread('updateTransitions', [ wasm.Addr2('_stack1')[0] ], true);
 
 
 
