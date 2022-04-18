@@ -28,10 +28,7 @@ window.addEventListener
 	{
 		const wasm = new WasmWrapper();
 
-		// 4gb == 65536 pages
-		const wasm_memory = new WebAssembly.Memory({ initial: 65536, maximum: 65536, shared: true });
-
-		await wasm.init(wasm_code, wasm_memory);
+		await wasm.init(wasm_code);
 
 		wasm.exports.initTransitionStack();
 		wasm.exports.constructRenderityWrappers();

@@ -28,6 +28,8 @@
 
 		"flags": "$(STD_20) $(NO_LINK) $(VERBOSE) $(OPT_FASTX) $(SSE) $(FLAGS_ADD) -matomics -mbulk-memory",
 
+		"args_linker": "--max-memory=4294967296",
+
 		"watch_files":
 		[
 			{
