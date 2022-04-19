@@ -61,6 +61,7 @@
 
 			{
 				"file": "$(REPS)/renderity/wrappers/build/$(ENV)/output/$(LIB_EXT)/wrappers.$(LIB_EXT)",
+				"watch_files": "$(REPS)/renderity/math/src/_intrin.h",
 				"watch_directories": "$(REPS)/renderity/wrappers/src",
 				"do": "genmake $(ENV) $(REPS)/renderity/wrappers/genmake.json"
 			},
