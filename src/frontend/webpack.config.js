@@ -64,8 +64,10 @@ module.exports = (env) =>
 					use:
 					[
 						MiniCssExtractPlugin.loader,
+
 						// to insert css into html
 						// 'style-loader',
+
 						'css-loader',
 						'sass-loader',
 					],
@@ -92,8 +94,11 @@ module.exports = (env) =>
 				},
 
 				{
-					test: /\.cpp$/,
+					test: /\.cpp.json$/,
 					use: '../../../cpp-webpack-loader/index.js',
+
+					// Required prop to prevent webpack from importing sources as json.
+					type: 'javascript/auto',
 				},
 			],
 		},

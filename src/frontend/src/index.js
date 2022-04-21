@@ -16,7 +16,8 @@ import * as THREE from 'three';
 import WasmWrapper from '../../../../wasm-wrapper/src/index.js';
 import RdtyRenderers from '../../../../renderers-web/src/index.js';
 
-import wasm_code from './cpp/src/entry-wasm32.cpp';
+// import wasm_code from '../../../../cpp-webpack-loader/index.js!./cpp/src/entry-wasm32.cpp';
+import wasm_code from './cpp/entry-wasm32.cpp.json';
 
 
 
