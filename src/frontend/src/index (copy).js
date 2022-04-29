@@ -52,7 +52,7 @@ window.addEventListener
 		await wasm_wrapper.init(wasm_code, wasm_memory);
 
 		wasm_wrapper.exports.initTransitionStack();
-		wasm_wrapper.exports.constructRenderityWrappers();
+		wasm_wrapper.exports.constructStage1();
 
 
 
@@ -580,7 +580,7 @@ window.addEventListener
 
 
 
-		wasm_wrapper.exports.constructRenderityWrappers2();
+		wasm_wrapper.exports.constructStage2();
 
 
 

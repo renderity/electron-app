@@ -31,8 +31,144 @@ window.addEventListener
 
 		await wasm.init(wasm_code);
 
-		wasm.exports.initTransitionStack();
-		wasm.exports.constructRenderityWrappers();
+
+
+		// wasm.exports.initTransitionStack();
+		wasm.exports.constructStage1();
+
+
+
+		const rdty_renderers = new RdtyRenderers(wasm);
+
+
+
+		// [
+		// 	{
+		// 		name: '_object',
+		// 		geometry: new THREE.SphereGeometry(10, 32, 32),
+		// 		position: [ -10, -10, 0 ],
+		// 	},
+
+		// 	{
+		// 		name: 'object2',
+		// 		geometry: new THREE.TorusGeometry(5, 1.5, 80, 16),
+		// 		position: [ -10, 10, 0 ],
+		// 	},
+
+		// 	{
+		// 		name: 'object3',
+		// 		geometry: new THREE.TorusKnotGeometry(5, 1.5, 80, 16),
+		// 		position: [ 10, -10, 0 ],
+		// 	},
+
+		// 	// {
+		// 	// 	name: 'object4',
+		// 	// 	geometry: new THREE.BoxGeometry(20, 20, 20, 32, 32, 32),
+		// 	// 	// geometry: new THREE.PlaneGeometry(20, 20, 32, 32).rotateX(Math.PI * 0.5),
+		// 	// 	position: [ 10, 10, 0 ],
+		// 	// },
+		// ]
+		// 	.slice(0, 3)
+		// 	.forEach
+		// 	(
+		// 		(desc, desc_index) =>
+		// 		{
+		// 			desc.geometry.translate(...desc.position);
+
+		// 			const obj = rdty_renderers.ObjectBase.getInstance2(desc.name);
+
+		// 			const _pos = new Float32Array(desc.geometry.attributes.position.array.length / 3 * 4);
+
+		// 			for (let i = 0; i < desc.geometry.attributes.position.array.length / 3; ++i)
+		// 			{
+		// 				_pos[(i * 4) + 0] = desc.geometry.attributes.position.array[(i * 3) + 0];
+		// 				_pos[(i * 4) + 1] = desc.geometry.attributes.position.array[(i * 3) + 1];
+		// 				_pos[(i * 4) + 2] = desc.geometry.attributes.position.array[(i * 3) + 2];
+		// 			}
+
+		// 			const _norm = new Float32Array(desc.geometry.attributes.normal.array.length / 3 * 4);
+
+		// 			for (let i = 0; i < desc.geometry.attributes.normal.array.length / 3; ++i)
+		// 			{
+		// 				_norm[(i * 4) + 0] = desc.geometry.attributes.normal.array[(i * 3) + 0];
+		// 				_norm[(i * 4) + 1] = desc.geometry.attributes.normal.array[(i * 3) + 1];
+		// 				_norm[(i * 4) + 2] = desc.geometry.attributes.normal.array[(i * 3) + 2];
+		// 			}
+
+		// 			const _ind = new Uint32Array(desc.geometry.index.array.length / 3 * 4);
+
+		// 			for (let i = 0; i < desc.geometry.index.array.length / 3; ++i)
+		// 			{
+		// 				_ind[(i * 4) + 0] = desc.geometry.index.array[(i * 3) + 0];
+		// 				_ind[(i * 4) + 1] = desc.geometry.index.array[(i * 3) + 1];
+		// 				_ind[(i * 4) + 2] = desc.geometry.index.array[(i * 3) + 2];
+		// 			}
+
+		// 			obj.updateStdVectorData('position_data', 'Float', _pos);
+		// 			obj.updateStdVectorData('normal_data', 'Float', _norm);
+		// 			obj.updateStdVectorData('index_data', 'Uint32', _ind);
+
+		// 			// if (desc_index === 2)
+		// 			// {
+		// 			// 	LOG
+		// 			// 	(
+		// 			// 		`
+		// 			// 			#include <cstdint>
+
+
+
+		// 			// 			struct O${ desc_index + 1 }
+		// 			// 			{
+		// 			// 				const float position_data [${ _pos.length }] { ${ Array.prototype.slice.call(_pos) } };
+		// 			// 				const float normal_data [${ _norm.length }] { ${ Array.prototype.slice.call(_norm) } };
+		// 			// 				const uint32_t index_data [${ _ind.length }] { ${ Array.prototype.slice.call(_ind) } };
+		// 			// 			};
+		// 			// 		`,
+		// 			// 	);
+		// 			// }
+		// 		},
+		// 	);
+
+
+
+		wasm.exports.updateObjectsData();
+		wasm.exports.constructStage2();
+
+
+
+		// const t = Date.now();
+
+		wasm.exports.generateBoxes(wasm.Addr2('_object')[0]);
+		wasm.exports.generateBoxes(wasm.Addr2('object2')[0]);
+		wasm.exports.generateBoxes(wasm.Addr2('object3')[0]);
+		// wasm.exports.generateBoxes(wasm.Addr2('object4')[0]);
+
+		// await new wasm.Thread('generateBoxes', [ wasm.Addr2('_object')[0] ]).join();
+		// await new wasm.Thread('generateBoxes', [ wasm.Addr2('object2')[0] ]).join();
+		// await new wasm.Thread('generateBoxes', [ wasm.Addr2('object3')[0] ]).join();
+		// // await new wasm.Thread('generateBoxes', [ wasm.Addr2('object4')[0] ]).join();
+
+		// const thr1 = new wasm.Thread('generateBoxes', [ wasm.Addr2('_object')[0] ]);
+		// const thr2 = new wasm.Thread('generateBoxes', [ wasm.Addr2('object2')[0] ]);
+		// const thr3 = new wasm.Thread('generateBoxes', [ wasm.Addr2('object3')[0] ]);
+		// // const thr4 = new wasm.Thread('generateBoxes', [ wasm.Addr2('object4')[0] ]);
+
+		// await thr1.join();
+		// await thr2.join();
+		// await thr3.join();
+		// // await thr4.join();
+
+		// LOG(Date.now() - t)
+
+
+
+		wasm.exports.constructStage3();
+
+
+
+		// // Use window.navigator.hardwareConcurrency?
+		// new wasm.Thread('updateTransitions', [ wasm.Addr2('_stack0')[0] ], true);
+		// new wasm.Thread('updateTransitions', [ wasm.Addr2('_stack1')[0] ], true);
 
 
 
@@ -57,111 +193,6 @@ window.addEventListener
 
 
 
-		const rdty_renderers = new RdtyRenderers(wasm);
-
-
-
-		const object_descriptors =
-		[
-			{
-				name: '_object',
-				geometry: new THREE.SphereGeometry(10, 32, 32),
-				position: [ -10, -10, 0 ],
-			},
-
-			{
-				name: 'object2',
-				geometry: new THREE.TorusGeometry(5, 1.5, 80, 16),
-				position: [ -10, 10, 0 ],
-			},
-
-			{
-				name: 'object3',
-				geometry: new THREE.TorusKnotGeometry(5, 1.5, 80, 16),
-				position: [ 10, -10, 0 ],
-			},
-
-			{
-				name: 'object4',
-				geometry: new THREE.BoxGeometry(20, 20, 20, 32, 32, 32),
-				// geometry: new THREE.PlaneGeometry(20, 20, 32, 32).rotateX(Math.PI * 0.5),
-				position: [ 10, 10, 0 ],
-			},
-		]
-			.slice(0, 4);
-
-
-
-		object_descriptors
-			.forEach
-			(
-				(desc) =>
-				{
-					desc.geometry.translate(...desc.position);
-
-					const obj = rdty_renderers.ObjectBase.getInstance2(desc.name);
-
-					const _pos = new Float32Array(desc.geometry.attributes.position.array.length / 3 * 4);
-
-					for (let i = 0; i < desc.geometry.attributes.position.array.length / 3; ++i)
-					{
-						_pos[(i * 4) + 0] = desc.geometry.attributes.position.array[(i * 3) + 0];
-						_pos[(i * 4) + 1] = desc.geometry.attributes.position.array[(i * 3) + 1];
-						_pos[(i * 4) + 2] = desc.geometry.attributes.position.array[(i * 3) + 2];
-					}
-
-					const _norm = new Float32Array(desc.geometry.attributes.normal.array.length / 3 * 4);
-
-					for (let i = 0; i < desc.geometry.attributes.normal.array.length / 3; ++i)
-					{
-						_norm[(i * 4) + 0] = desc.geometry.attributes.normal.array[(i * 3) + 0];
-						_norm[(i * 4) + 1] = desc.geometry.attributes.normal.array[(i * 3) + 1];
-						_norm[(i * 4) + 2] = desc.geometry.attributes.normal.array[(i * 3) + 2];
-					}
-
-					const _ind = new Uint32Array(desc.geometry.index.array.length / 3 * 4);
-
-					for (let i = 0; i < desc.geometry.index.array.length / 3; ++i)
-					{
-						_ind[(i * 4) + 0] = desc.geometry.index.array[(i * 3) + 0];
-						_ind[(i * 4) + 1] = desc.geometry.index.array[(i * 3) + 1];
-						_ind[(i * 4) + 2] = desc.geometry.index.array[(i * 3) + 2];
-					}
-
-					obj.updateStdVectorData('position_data', 'Float', _pos);
-					obj.updateStdVectorData('normal_data', 'Float', _norm);
-					obj.updateStdVectorData('index_data', 'Uint32', _ind);
-				},
-			);
-
-
-
-		wasm.exports.constructRenderityWrappers2();
-
-
-
-		const t = Date.now();
-
-		const thr1 = new wasm.Thread('generateBoxes', [ wasm.Addr2('_object')[0] ]);
-		const thr2 = new wasm.Thread('generateBoxes', [ wasm.Addr2('object2')[0] ]);
-		const thr3 = new wasm.Thread('generateBoxes', [ wasm.Addr2('object3')[0] ]);
-		const thr4 = new wasm.Thread('generateBoxes', [ wasm.Addr2('object4')[0] ]);
-
-		await thr1.join();
-		await thr2.join();
-		await thr3.join();
-		await thr4.join();
-
-		LOG(Date.now() - t)
-
-
-
-		// // Use window.navigator.hardwareConcurrency?
-		// new wasm.Thread('updateTransitions', [ wasm.Addr2('_stack0')[0] ], true);
-		// new wasm.Thread('updateTransitions', [ wasm.Addr2('_stack1')[0] ], true);
-
-
-
 		const webgpu = new rdty_renderers.WebGPU(wasm);
 
 		const renderer =
@@ -182,34 +213,17 @@ window.addEventListener
 
 		const
 			{
-				Scene,
 				Material,
-				UniformBlock,
-				StorageBlock3,
 				DescriptorSet,
 				Object,
 			} = renderer;
 
 
 
-		const scene = Scene.getInstance2('scene');
-		LOG(scene)
-
-
-
-		const surface_uniform_block_camera = UniformBlock.getInstance2('surface_uniform_block_camera');
-
-		const tree_storage_block = new StorageBlock3(scene.original_struct.boxes, 3);
-		const tri_storage_block = new StorageBlock3(scene.original_struct.triangles, 1);
-
-
-
-		scene.makeDescriptorSet
-		([ tree_storage_block, tri_storage_block, surface_uniform_block_camera ]);
+		const descriptor_set_scene = DescriptorSet.getInstance2('descriptor_set_scene');
 
 		const surface_material =
-			Material.getInstance2
-			('surface_material', Material.ShaderUsage.GLSL, [ scene.descriptor_set ]);
+			Material.getInstance2('surface_material', Material.ShaderUsage.GLSL);
 
 		const surface_object = Object.getInstance2('surface_object');
 
@@ -242,7 +256,7 @@ window.addEventListener
 			renderer.render_pass_encoder.setVertexBuffer
 			(0, surface_object.position_buffer, 0, surface_object.original_struct.position_data.byteLength);
 
-			scene.descriptor_set.use(0);
+			descriptor_set_scene.use(0);
 
 			surface_material.use();
 

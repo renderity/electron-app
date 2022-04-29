@@ -20,7 +20,7 @@
 
 
 
-extern "C" void constructRenderityWrappers (void);
+extern "C" void constructStage1 (void);
 
 extern void initOpengl (const bool&);
 extern void initVulkan (const bool&, const size_t& = 0);
@@ -61,7 +61,7 @@ Napi::Value testRenderingThread (const Napi::CallbackInfo& info)
 
 void _constructRenderityWrappers (const Napi::CallbackInfo& info)
 {
-	constructRenderityWrappers();
+	constructStage1();
 }
 
 void terminateRenderingThread (const Napi::CallbackInfo& info)
