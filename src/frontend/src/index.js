@@ -42,96 +42,96 @@ window.addEventListener
 
 
 
-		// [
-		// 	{
-		// 		name: '_object',
-		// 		geometry: new THREE.SphereGeometry(10, 32, 32),
-		// 		position: [ -10, -10, 0 ],
-		// 	},
+		[
+			{
+				name: '_object',
+				geometry: new THREE.SphereGeometry(10, 32, 32),
+				position: [ -10, -10, 0 ],
+			},
 
-		// 	{
-		// 		name: 'object2',
-		// 		geometry: new THREE.TorusGeometry(5, 1.5, 80, 16),
-		// 		position: [ -10, 10, 0 ],
-		// 	},
+			{
+				name: 'object2',
+				geometry: new THREE.TorusGeometry(5, 1.5, 80, 16),
+				position: [ -10, 10, 0 ],
+			},
 
-		// 	{
-		// 		name: 'object3',
-		// 		geometry: new THREE.TorusKnotGeometry(5, 1.5, 80, 16),
-		// 		position: [ 10, -10, 0 ],
-		// 	},
+			{
+				name: 'object3',
+				geometry: new THREE.TorusKnotGeometry(5, 1.5, 80, 16),
+				position: [ 10, -10, 0 ],
+			},
 
-		// 	// {
-		// 	// 	name: 'object4',
-		// 	// 	geometry: new THREE.BoxGeometry(20, 20, 20, 32, 32, 32),
-		// 	// 	// geometry: new THREE.PlaneGeometry(20, 20, 32, 32).rotateX(Math.PI * 0.5),
-		// 	// 	position: [ 10, 10, 0 ],
-		// 	// },
-		// ]
-		// 	.slice(0, 3)
-		// 	.forEach
-		// 	(
-		// 		(desc, desc_index) =>
-		// 		{
-		// 			desc.geometry.translate(...desc.position);
+			{
+				name: 'object4',
+				geometry: new THREE.BoxGeometry(20, 20, 20, 32, 32, 32),
+				// geometry: new THREE.PlaneGeometry(20, 20, 32, 32).rotateX(Math.PI * 0.5),
+				position: [ 10, 10, 0 ],
+			},
+		]
+			// .slice(0, 3)
+			.forEach
+			(
+				(desc, desc_index) =>
+				{
+					desc.geometry.translate(...desc.position);
 
-		// 			const obj = rdty_renderers.ObjectBase.getInstance2(desc.name);
+					const obj = rdty_renderers.ObjectBase.getInstance2(desc.name);
 
-		// 			const _pos = new Float32Array(desc.geometry.attributes.position.array.length / 3 * 4);
+					const _pos = new Float32Array(desc.geometry.attributes.position.array.length / 3 * 4);
 
-		// 			for (let i = 0; i < desc.geometry.attributes.position.array.length / 3; ++i)
-		// 			{
-		// 				_pos[(i * 4) + 0] = desc.geometry.attributes.position.array[(i * 3) + 0];
-		// 				_pos[(i * 4) + 1] = desc.geometry.attributes.position.array[(i * 3) + 1];
-		// 				_pos[(i * 4) + 2] = desc.geometry.attributes.position.array[(i * 3) + 2];
-		// 			}
+					for (let i = 0; i < desc.geometry.attributes.position.array.length / 3; ++i)
+					{
+						_pos[(i * 4) + 0] = desc.geometry.attributes.position.array[(i * 3) + 0];
+						_pos[(i * 4) + 1] = desc.geometry.attributes.position.array[(i * 3) + 1];
+						_pos[(i * 4) + 2] = desc.geometry.attributes.position.array[(i * 3) + 2];
+					}
 
-		// 			const _norm = new Float32Array(desc.geometry.attributes.normal.array.length / 3 * 4);
+					const _norm = new Float32Array(desc.geometry.attributes.normal.array.length / 3 * 4);
 
-		// 			for (let i = 0; i < desc.geometry.attributes.normal.array.length / 3; ++i)
-		// 			{
-		// 				_norm[(i * 4) + 0] = desc.geometry.attributes.normal.array[(i * 3) + 0];
-		// 				_norm[(i * 4) + 1] = desc.geometry.attributes.normal.array[(i * 3) + 1];
-		// 				_norm[(i * 4) + 2] = desc.geometry.attributes.normal.array[(i * 3) + 2];
-		// 			}
+					for (let i = 0; i < desc.geometry.attributes.normal.array.length / 3; ++i)
+					{
+						_norm[(i * 4) + 0] = desc.geometry.attributes.normal.array[(i * 3) + 0];
+						_norm[(i * 4) + 1] = desc.geometry.attributes.normal.array[(i * 3) + 1];
+						_norm[(i * 4) + 2] = desc.geometry.attributes.normal.array[(i * 3) + 2];
+					}
 
-		// 			const _ind = new Uint32Array(desc.geometry.index.array.length / 3 * 4);
+					const _ind = new Uint32Array(desc.geometry.index.array.length / 3 * 4);
 
-		// 			for (let i = 0; i < desc.geometry.index.array.length / 3; ++i)
-		// 			{
-		// 				_ind[(i * 4) + 0] = desc.geometry.index.array[(i * 3) + 0];
-		// 				_ind[(i * 4) + 1] = desc.geometry.index.array[(i * 3) + 1];
-		// 				_ind[(i * 4) + 2] = desc.geometry.index.array[(i * 3) + 2];
-		// 			}
+					for (let i = 0; i < desc.geometry.index.array.length / 3; ++i)
+					{
+						_ind[(i * 4) + 0] = desc.geometry.index.array[(i * 3) + 0];
+						_ind[(i * 4) + 1] = desc.geometry.index.array[(i * 3) + 1];
+						_ind[(i * 4) + 2] = desc.geometry.index.array[(i * 3) + 2];
+					}
 
-		// 			obj.updateStdVectorData('position_data', 'Float', _pos);
-		// 			obj.updateStdVectorData('normal_data', 'Float', _norm);
-		// 			obj.updateStdVectorData('index_data', 'Uint32', _ind);
+					obj.updateStdVectorData('position_data', 'Float', _pos);
+					obj.updateStdVectorData('normal_data', 'Float', _norm);
+					obj.updateStdVectorData('index_data', 'Uint32', _ind);
 
-		// 			// if (desc_index === 2)
-		// 			// {
-		// 			// 	LOG
-		// 			// 	(
-		// 			// 		`
-		// 			// 			#include <cstdint>
-
-
-
-		// 			// 			struct O${ desc_index + 1 }
-		// 			// 			{
-		// 			// 				const float position_data [${ _pos.length }] { ${ Array.prototype.slice.call(_pos) } };
-		// 			// 				const float normal_data [${ _norm.length }] { ${ Array.prototype.slice.call(_norm) } };
-		// 			// 				const uint32_t index_data [${ _ind.length }] { ${ Array.prototype.slice.call(_ind) } };
-		// 			// 			};
-		// 			// 		`,
-		// 			// 	);
-		// 			// }
-		// 		},
-		// 	);
+					// if (desc_index === 2)
+					// {
+					// 	LOG
+					// 	(
+					// 		`
+					// 			#include <cstdint>
 
 
 
-		wasm.exports.updateObjectsData();
+					// 			struct O${ desc_index + 1 }
+					// 			{
+					// 				const float position_data [${ _pos.length }] { ${ Array.prototype.slice.call(_pos) } };
+					// 				const float normal_data [${ _norm.length }] { ${ Array.prototype.slice.call(_norm) } };
+					// 				const uint32_t index_data [${ _ind.length }] { ${ Array.prototype.slice.call(_ind) } };
+					// 			};
+					// 		`,
+					// 	);
+					// }
+				},
+			);
+
+
+
+		// wasm.exports.updateObjectsData();
 		wasm.exports.constructStage2();
 
 
@@ -141,7 +141,7 @@ window.addEventListener
 		wasm.exports.generateBoxes(wasm.Addr2('_object')[0]);
 		wasm.exports.generateBoxes(wasm.Addr2('object2')[0]);
 		wasm.exports.generateBoxes(wasm.Addr2('object3')[0]);
-		// wasm.exports.generateBoxes(wasm.Addr2('object4')[0]);
+		wasm.exports.generateBoxes(wasm.Addr2('object4')[0]);
 
 		// await new wasm.Thread('generateBoxes', [ wasm.Addr2('_object')[0] ]).join();
 		// await new wasm.Thread('generateBoxes', [ wasm.Addr2('object2')[0] ]).join();
