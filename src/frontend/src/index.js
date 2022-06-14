@@ -14,7 +14,7 @@ import * as THREE from 'three';
 // import { mergeVertices } from 'three/examples/jsm/utils/BufferGeometryUtils.js';
 
 import WasmWrapper from '../../../../wasm-wrapper/src/index.js';
-import RdtyRenderers from '../../../../renderers-web/src/index.js';
+import RenderersWeb from '../../../../renderers-web/src/index.js';
 
 // import wasm_code from '../../../../cpp-webpack-loader/index.js!./cpp/src/entry-wasm32.cpp';
 import wasm_code from './cpp/entry-wasm32.cpp.json';
@@ -27,25 +27,32 @@ window.addEventListener
 
 	async () =>
 	{
-		const wasm = new WasmWrapper();
+		const wasm =
+			new WasmWrapper
+			({
+				// window.navigator.hardwareConcurrency
+				thread_count: 4,
+				thread_stack_size: 1024 * 1024,
+			});
 
 		await wasm.init(wasm_code);
 
 
 
-		// wasm.exports.initTransitionStack();
+		wasm.exports.initTransitionStack();
 		wasm.exports.constructStage1();
 
 
 
-		const rdty_renderers = new RdtyRenderers(wasm);
+		const renderers_web = new RenderersWeb(wasm);
 
 
 
 		[
 			{
 				name: '_object',
-				geometry: new THREE.SphereGeometry(10, 32, 32),
+				geometry: new THREE.SphereGeometry(10, 64, 64),
+				// geometry: new THREE.OctahedronGeometry(10, 32),
 				position: [ -10, -10, 0 ],
 			},
 
@@ -64,7 +71,7 @@ window.addEventListener
 			{
 				name: 'object4',
 				geometry: new THREE.BoxGeometry(20, 20, 20, 32, 32, 32),
-				// geometry: new THREE.PlaneGeometry(20, 20, 32, 32).rotateX(Math.PI * 0.5),
+				// geometry: new THREE.PlaneGeometry(20, 20, 32, 32).rotateX(Math.PI * 0.25),
 				position: [ 10, 10, 0 ],
 			},
 		]
@@ -75,7 +82,7 @@ window.addEventListener
 				{
 					desc.geometry.translate(...desc.position);
 
-					const obj = rdty_renderers.ObjectBase.getInstance2(desc.name);
+					const obj = renderers_web.ObjectBase.getInstance2(desc.name);
 
 					const _pos = new Float32Array(desc.geometry.attributes.position.array.length / 3 * 4);
 
@@ -136,29 +143,38 @@ window.addEventListener
 
 
 
-		// const t = Date.now();
+		// const stack_addr = wasm.exports.RDTY_WASM_WRAPPER_malloc(1024 * 1024 * 4);
 
-		wasm.exports.generateBoxes(wasm.Addr2('_object')[0]);
-		wasm.exports.generateBoxes(wasm.Addr2('object2')[0]);
-		wasm.exports.generateBoxes(wasm.Addr2('object3')[0]);
-		wasm.exports.generateBoxes(wasm.Addr2('object4')[0]);
+		const t = Date.now();
+
+		// wasm.exports.generateBoxes(wasm.Addr2('_object')[0]);
+		// wasm.exports.generateBoxes(wasm.Addr2('object2')[0]);
+		// wasm.exports.generateBoxes(wasm.Addr2('object3')[0]);
+		// wasm.exports.generateBoxes(wasm.Addr2('object4')[0]);
 
 		// await new wasm.Thread('generateBoxes', [ wasm.Addr2('_object')[0] ]).join();
 		// await new wasm.Thread('generateBoxes', [ wasm.Addr2('object2')[0] ]).join();
 		// await new wasm.Thread('generateBoxes', [ wasm.Addr2('object3')[0] ]).join();
-		// // await new wasm.Thread('generateBoxes', [ wasm.Addr2('object4')[0] ]).join();
+		// await new wasm.Thread('generateBoxes', [ wasm.Addr2('object4')[0] ]).join();
 
-		// const thr1 = new wasm.Thread('generateBoxes', [ wasm.Addr2('_object')[0] ]);
-		// const thr2 = new wasm.Thread('generateBoxes', [ wasm.Addr2('object2')[0] ]);
-		// const thr3 = new wasm.Thread('generateBoxes', [ wasm.Addr2('object3')[0] ]);
-		// // const thr4 = new wasm.Thread('generateBoxes', [ wasm.Addr2('object4')[0] ]);
+		// const thr1 = new wasm.Thread('generateBoxes', [ wasm.Addr2('_object')[0] ], stack_addr);
+		// const thr2 = new wasm.Thread('generateBoxes', [ wasm.Addr2('object2')[0] ], stack_addr + (1024 * 1024 * 1));
+		// const thr3 = new wasm.Thread('generateBoxes', [ wasm.Addr2('object3')[0] ], stack_addr + (1024 * 1024 * 2));
+		// const thr4 = new wasm.Thread('generateBoxes', [ wasm.Addr2('object4')[0] ], stack_addr + (1024 * 1024 * 3));
 
-		// await thr1.join();
-		// await thr2.join();
-		// await thr3.join();
-		// // await thr4.join();
+		const thr1 = new wasm.Thread('generateBoxes', [ wasm.Addr2('_object')[0] ]);
+		const thr2 = new wasm.Thread('generateBoxes', [ wasm.Addr2('object2')[0] ]);
+		const thr3 = new wasm.Thread('generateBoxes', [ wasm.Addr2('object3')[0] ]);
+		const thr4 = new wasm.Thread('generateBoxes', [ wasm.Addr2('object4')[0] ]);
 
-		// LOG(Date.now() - t)
+		await thr1.join();
+		await thr2.join();
+		await thr3.join();
+		await thr4.join();
+
+		LOG(Date.now() - t)
+
+		// wasm.exports.RDTY_WASM_WRAPPER_free(stack_addr);
 
 
 
@@ -166,16 +182,15 @@ window.addEventListener
 
 
 
-		// // Use window.navigator.hardwareConcurrency?
-		// new wasm.Thread('updateTransitions', [ wasm.Addr2('_stack0')[0] ], true);
-		// new wasm.Thread('updateTransitions', [ wasm.Addr2('_stack1')[0] ], true);
+		new wasm.Thread('updateTransitions', [ wasm.Addr2('_stack0')[0] ], null, true);
+		new wasm.Thread('updateTransitions', [ wasm.Addr2('_stack1')[0] ], null, true);
 
 
 
 		{
-			const Orbit = wasm.Class('RDTY::MATH::Orbit');
+			// const Orbit = wasm.Class('RDTY::MATH::Orbit');
 
-			const orbit = new Orbit('orbit');
+			// const orbit = new Orbit('orbit');
 
 			window.addEventListener
 			(
@@ -183,17 +198,19 @@ window.addEventListener
 
 				(evt) =>
 				{
-					orbit.rotate3(evt.movementY * 0.01, evt.movementX * 0.01);
-					orbit.update();
+					// orbit.rotate3(evt.movementY * 0.01, evt.movementX * 0.01);
+					// orbit.update();
 
-					wasm.exports.startTransition();
+					// LOG(evt.movementY * 0.01, evt.movementX * 0.01)
+
+					wasm.exports.startTransition(evt.movementY * 0.001, evt.movementX * 0.001);
 				},
 			);
 		}
 
 
 
-		const webgpu = new rdty_renderers.WebGPU(wasm);
+		const webgpu = new renderers_web.WebGPU(wasm);
 
 		const renderer =
 			new webgpu.Renderer

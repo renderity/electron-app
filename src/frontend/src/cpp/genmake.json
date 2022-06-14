@@ -1,17 +1,8 @@
 {
 	"variables":
 	{
-		"clang-wasm32":
-		{
-			"LIBS": "/home/denis/libs",
-			"REPS": "/home/denis/reps"
-		},
-
-		"clang-wasm64":
-		{
-			"LIBS": "/home/denis/libs",
-			"REPS": "/home/denis/reps"
-		}
+		"LIBS": "$(ROOT)/libs",
+		"REPS": "$(ROOT)/reps"
 	},
 
 	"entries":

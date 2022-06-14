@@ -14,15 +14,15 @@ set_target_properties(${PROJECT_NAME} PROPERTIES PREFIX "" SUFFIX ".node")
 target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_JS_INC} "${CMAKE_SOURCE_DIR}/node_modules/node-addon-api")
 
 # For renderity includes and renderity internal includes
-target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_JS_INC} "/home/denis/reps" "/home/denis/reps/renderity")
+target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_JS_INC} "~/reps" "~/reps/renderity")
 
-target_link_libraries(${PROJECT_NAME} ${CMAKE_JS_LIB} /home/denis/reps/renderity/test/build/gcc-x64/output/a/test.a)
+target_link_libraries(${PROJECT_NAME} ${CMAKE_JS_LIB} ~/reps/renderity/test/build/gcc-x64/output/a/test.a)
 
-add_custom_target(math WORKING_DIRECTORY /home/denis/reps/renderity/math/src COMMAND cd /home/denis/reps/renderity/test && genmake gcc-x64)
-add_custom_target(aux WORKING_DIRECTORY /home/denis/reps/renderity/aux/src COMMAND cd /home/denis/reps/renderity/test && genmake gcc-x64)
-add_custom_target(wrappers WORKING_DIRECTORY /home/denis/reps/renderity/wrappers/src COMMAND cd /home/denis/reps/renderity/test && genmake gcc-x64)
-add_custom_target(renderers WORKING_DIRECTORY /home/denis/reps/renderity/renderers/src COMMAND cd /home/denis/reps/renderity/test && genmake gcc-x64)
-add_custom_target(test WORKING_DIRECTORY /home/denis/reps/renderity/test/src COMMAND cd /home/denis/reps/renderity/test && genmake gcc-x64)
+add_custom_target(math WORKING_DIRECTORY ~/reps/renderity/math/src COMMAND cd ~/reps/renderity/test && genmake gcc-x64)
+add_custom_target(aux WORKING_DIRECTORY ~/reps/renderity/aux/src COMMAND cd ~/reps/renderity/test && genmake gcc-x64)
+add_custom_target(wrappers WORKING_DIRECTORY ~/reps/renderity/wrappers/src COMMAND cd ~/reps/renderity/test && genmake gcc-x64)
+add_custom_target(renderers WORKING_DIRECTORY ~/reps/renderity/renderers/src COMMAND cd ~/reps/renderity/test && genmake gcc-x64)
+add_custom_target(test WORKING_DIRECTORY ~/reps/renderity/test/src COMMAND cd ~/reps/renderity/test && genmake gcc-x64)
 
 add_dependencies(${PROJECT_NAME} math)
 add_dependencies(${PROJECT_NAME} aux)

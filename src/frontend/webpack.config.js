@@ -95,7 +95,13 @@ module.exports = (env) =>
 
 				{
 					test: /\.cpp.json$/,
-					use: '../../../cpp-webpack-loader/index.js',
+
+					use:
+					{
+						loader: '../../../cpp-webpack-loader/index.js',
+
+						options: { root: path.join(__dirname, '../../../../..') },
+					},
 
 					// Required prop to prevent webpack from importing sources as json.
 					type: 'javascript/auto',
