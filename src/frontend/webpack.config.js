@@ -163,7 +163,16 @@ module.exports = (env) =>
 			historyApiFallback: true,
 			host: 'localhost',
 			port: 8080,
-			// open: true,
+
+			open:
+			{
+				app:
+				{
+					name: 'Google Chrome Dev',
+
+					arguments: [ '--auto-open-devtools-for-tabs' ],
+				},
+			},
 
 			// Enable using shared array buffers.
 			headers:

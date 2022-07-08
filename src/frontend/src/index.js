@@ -30,6 +30,7 @@ window.addEventListener
 		const wasm =
 			new WasmWrapper
 			({
+				usePreallocatedThreadStack: true,
 				// window.navigator.hardwareConcurrency
 				thread_count: 4,
 				thread_stack_size: 1024 * 1024,
@@ -85,12 +86,15 @@ window.addEventListener
 					const obj = renderers_web.ObjectBase.getInstance2(desc.name);
 
 					const _pos = new Float32Array(desc.geometry.attributes.position.array.length / 3 * 4);
+					const _pos_uint = new Uint32Array(_pos.buffer);
 
 					for (let i = 0; i < desc.geometry.attributes.position.array.length / 3; ++i)
 					{
 						_pos[(i * 4) + 0] = desc.geometry.attributes.position.array[(i * 3) + 0];
 						_pos[(i * 4) + 1] = desc.geometry.attributes.position.array[(i * 3) + 1];
 						_pos[(i * 4) + 2] = desc.geometry.attributes.position.array[(i * 3) + 2];
+
+						_pos_uint[(i * 4) + 3] = desc_index;
 					}
 
 					const _norm = new Float32Array(desc.geometry.attributes.normal.array.length / 3 * 4);
@@ -188,9 +192,11 @@ window.addEventListener
 
 
 		{
-			// const Orbit = wasm.Class('RDTY::MATH::Orbit');
+			const Orbit = wasm.Class('RDTY::MATH::Orbit');
 
-			// const orbit = new Orbit('orbit');
+			const orbit = new Orbit('orbit');
+
+			LOG(Orbit.prototype)
 
 			window.addEventListener
 			(
@@ -205,6 +211,23 @@ window.addEventListener
 
 					wasm.exports.startTransition(evt.movementY * 0.001, evt.movementX * 0.001);
 				},
+			);
+
+			window.addEventListener
+			(
+				'wheel',
+
+				(evt) =>
+				{
+					evt.preventDefault();
+
+					const sign = (evt.deltaY || evt.detail || evt.wheelDelta) * 0.05;
+
+					orbit.transZ3(sign);
+					orbit.update();
+				},
+
+				false,
 			);
 		}
 

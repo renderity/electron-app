@@ -2,7 +2,8 @@
 	"variables":
 	{
 		"LIBS": "$(ROOT)/libs",
-		"REPS": "$(ROOT)/reps"
+		"REPS": "$(ROOT)/reps",
+		"SCALAR_REF_PARAM": "-D \"SCALAR_REF_PARAM(x) = x\""
 	},
 
 	"entries":
@@ -17,7 +18,7 @@
 			"$(REPS)/renderity"
 		],
 
-		"flags": "$(STD_20) $(NO_LINK) $(VERBOSE) $(OPT_FASTX) $(SSE) $(FLAGS_ADD) -matomics -mbulk-memory",
+		"flags": "$(STD_20) $(NO_LINK) $(VERBOSE) $(OPT_FASTX) $(SSE) $(FLAGS_ADD) -matomics -mbulk-memory $(SCALAR_REF_PARAM)",
 
 		"args_linker": "--max-memory=4294967296",
 
