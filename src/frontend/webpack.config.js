@@ -168,9 +168,34 @@ module.exports = (env) =>
 			{
 				app:
 				{
-					name: 'Google Chrome Dev',
+					name: (() =>
+					{
+						switch (process.platform)
+						{
+						case 'linux': return 'google-chrome-unstable';
 
-					arguments: [ '--auto-open-devtools-for-tabs' ],
+						case 'darwin': return 'Google Chrome Dev';
+
+						default: return 0;
+						}
+					})(),
+
+					arguments: (() =>
+					{
+						switch (process.platform)
+						{
+						case 'linux':
+
+							return [
+								'--auto-open-devtools-for-tabs',
+								'--enable-features=Vulkan,UseSkiaRenderer',
+							];
+
+						case 'darwin': return [ '--auto-open-devtools-for-tabs' ];
+
+						default: return 0;
+						}
+					})(),
 				},
 			},
 
