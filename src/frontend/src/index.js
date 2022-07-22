@@ -11,13 +11,18 @@ no-magic-numbers,
 import './index.scss';
 
 import * as THREE from 'three';
-// import { mergeVertices } from 'three/examples/jsm/utils/BufferGeometryUtils.js';
+import { mergeVertices } from 'three/examples/jsm/utils/BufferGeometryUtils.js';
+import { OBJLoader } from 'three/examples/jsm/loaders/OBJLoader.js';
 
 import WasmWrapper from '../../../../wasm-wrapper/src/index.js';
 import RenderersWeb from '../../../../renderers-web/src/index.js';
 
 // import wasm_code from '../../../../cpp-webpack-loader/index.js!./cpp/src/entry-wasm32.cpp';
 import wasm_code from './cpp/entry-wasm32.cpp.json';
+
+LOG(OBJLoader)
+
+const loader = new OBJLoader();
 
 
 
@@ -52,20 +57,37 @@ window.addEventListener
 		[
 			{
 				name: '_object',
-				geometry: new THREE.SphereGeometry(10, 64, 64),
+				// geometry: new THREE.SphereGeometry(10, 64, 64),
 				// geometry: new THREE.OctahedronGeometry(10, 32),
+
+				geometry:
+				(
+					await new Promise
+					(
+						resolve =>
+						{
+							loader.load
+							(
+								'public/d4a9_scan_crown.obj',
+
+								_object => resolve(mergeVertices(_object.children[0].geometry).center()),
+							);
+						},
+					)
+				),
+
 				position: [ -10, -10, 0 ],
 			},
 
 			{
 				name: 'object2',
-				geometry: new THREE.TorusGeometry(5, 1.5, 80, 16),
+				geometry: new THREE.TorusGeometry(5, 1.5, 160, 32),
 				position: [ -10, 10, 0 ],
 			},
 
 			{
 				name: 'object3',
-				geometry: new THREE.TorusKnotGeometry(5, 1.5, 80, 16),
+				geometry: new THREE.TorusKnotGeometry(5, 1.5, 160, 32),
 				position: [ 10, -10, 0 ],
 			},
 
@@ -90,29 +112,23 @@ window.addEventListener
 
 					for (let i = 0; i < desc.geometry.attributes.position.array.length / 3; ++i)
 					{
-						_pos[(i * 4) + 0] = desc.geometry.attributes.position.array[(i * 3) + 0];
-						_pos[(i * 4) + 1] = desc.geometry.attributes.position.array[(i * 3) + 1];
-						_pos[(i * 4) + 2] = desc.geometry.attributes.position.array[(i * 3) + 2];
+						_pos.set(desc.geometry.attributes.position.array.subarray(i * 3, (i * 3) + 4), i * 4);
 
 						_pos_uint[(i * 4) + 3] = desc_index;
 					}
 
-					const _norm = new Float32Array(desc.geometry.attributes.normal.array.length / 3 * 4);
+					const _norm = new Float32Array(_pos.length);
 
 					for (let i = 0; i < desc.geometry.attributes.normal.array.length / 3; ++i)
 					{
-						_norm[(i * 4) + 0] = desc.geometry.attributes.normal.array[(i * 3) + 0];
-						_norm[(i * 4) + 1] = desc.geometry.attributes.normal.array[(i * 3) + 1];
-						_norm[(i * 4) + 2] = desc.geometry.attributes.normal.array[(i * 3) + 2];
+						_norm.set(desc.geometry.attributes.normal.array.subarray(i * 3, (i * 3) + 4), i * 4);
 					}
 
 					const _ind = new Uint32Array(desc.geometry.index.array.length / 3 * 4);
 
 					for (let i = 0; i < desc.geometry.index.array.length / 3; ++i)
 					{
-						_ind[(i * 4) + 0] = desc.geometry.index.array[(i * 3) + 0];
-						_ind[(i * 4) + 1] = desc.geometry.index.array[(i * 3) + 1];
-						_ind[(i * 4) + 2] = desc.geometry.index.array[(i * 3) + 2];
+						_ind.set(desc.geometry.index.array.subarray(i * 3, (i * 3) + 4), i * 4);
 					}
 
 					obj.updateStdVectorData('position_data', 'Float', _pos);
@@ -196,8 +212,6 @@ window.addEventListener
 
 			const orbit = new Orbit('orbit');
 
-			LOG(Orbit.prototype)
-
 			window.addEventListener
 			(
 				'mousemove',
@@ -221,13 +235,18 @@ window.addEventListener
 				{
 					evt.preventDefault();
 
-					const sign = (evt.deltaY || evt.detail || evt.wheelDelta) * 0.05;
+					const sign = (evt.deltaY || evt.detail || evt.wheelDelta) * 0.1;
 
 					orbit.transZ3(sign);
 					orbit.update();
 				},
+			);
 
-				false,
+			document.querySelector('#webgpu').addEventListener
+			(
+				'wheel',
+
+				evt => evt.preventDefault(),
 			);
 		}
 
