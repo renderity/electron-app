@@ -20,9 +20,9 @@ import RenderersWeb from '../../../../renderers-web/src/index.js';
 // import wasm_code from '../../../../cpp-webpack-loader/index.js!./cpp/src/entry-wasm32.cpp';
 import wasm_code from './cpp/entry-wasm32.cpp.json';
 
-LOG(OBJLoader)
 
-const loader = new OBJLoader();
+
+const obj_loader = new OBJLoader();
 
 
 
@@ -66,7 +66,7 @@ window.addEventListener
 					(
 						resolve =>
 						{
-							loader.load
+							obj_loader.load
 							(
 								'public/d4a9_scan_crown.obj',
 
