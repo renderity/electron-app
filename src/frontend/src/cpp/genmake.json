@@ -24,26 +24,28 @@
 
 		"watch_files":
 		[
-			{
-				"file": "$(REPS)/renderity/test/src/main.cpp",
+			// {
+			// 	"file": "$(REPS)/renderity/test/src/main.cpp",
 
-				"watch_files":
-				[
-					"$(REPS)/renderity/math/src/mat4/mat4.h",
-					"$(REPS)/renderity/math/src/orbit/orbit.h",
-					"$(REPS)/renderity/math/src/util/util.h",
+			// 	"watch_files":
+			// 	[
+			// 		"$(REPS)/renderity/math/src/mat4/mat4.h",
+			// 		"$(REPS)/renderity/math/src/orbit/orbit.h",
+			// 		"$(REPS)/renderity/math/src/util/util.h",
 
-					"$(REPS)/renderity/aux/src/transition-stack/transition-stack.h",
-					"$(REPS)/renderity/aux/src/transition/transition.h",
+			// 		"$(REPS)/renderity/aux/src/transition-stack/transition-stack.h",
+			// 		"$(REPS)/renderity/aux/src/transition/transition.h",
 
-					"$(REPS)/renderity/wrappers/src/uniform/uniform.h",
-					"$(REPS)/renderity/wrappers/src/uniform-block/uniform-block.h",
-					"$(REPS)/renderity/wrappers/src/descriptor-set/descriptor-set.h",
-					"$(REPS)/renderity/wrappers/src/material/material.h",
-					"$(REPS)/renderity/wrappers/src/object/object.h",
-					"$(REPS)/renderity/wrappers/src/scene/scene.h"
-				]
-			},
+			// 		"$(REPS)/renderity/wrappers/src/uniform/uniform.h",
+			// 		"$(REPS)/renderity/wrappers/src/uniform-block/uniform-block.h",
+			// 		"$(REPS)/renderity/wrappers/src/descriptor-set/descriptor-set.h",
+			// 		"$(REPS)/renderity/wrappers/src/material/material.h",
+			// 		"$(REPS)/renderity/wrappers/src/object/object.h",
+			// 		"$(REPS)/renderity/wrappers/src/scene/scene.h"
+			// 	]
+			// },
+
+			"$(REPS)/renderity/test/src/main.cpp",
 
 			{
 				"file": "$(REPS)/renderity/math/build/$(ENV)/output/$(LIB_EXT)/math.$(LIB_EXT)",
